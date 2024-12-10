@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import TerminalSearch from "./TerminalSearch";
 import { useEffect, useRef } from "react";
+import AccountManager from "./AccountManager";
 
 export default function Header() {
   const searchRef = useRef<HTMLInputElement>(null!);
@@ -32,7 +33,10 @@ export default function Header() {
           {usePathname().replace("/", "") || "Home"}
         </span>
       </div>
-      <TerminalSearch inputRef={searchRef} />
+      <div className="flex">
+        <AccountManager />
+        <TerminalSearch inputRef={searchRef} />
+      </div>
     </div>
   );
 }
