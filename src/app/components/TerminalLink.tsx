@@ -6,8 +6,11 @@ export default function TerminalLink({
   children: React.ReactNode;
 }) {
   return (
-    <a href={href} className="text-white hover:text-accent transition-colors">
-      [[{children}]]
+    <a
+      href={href}
+      className="text-blue-300 hover:underline hover:text-blue-600"
+    >
+      {children}
     </a>
   );
 }
