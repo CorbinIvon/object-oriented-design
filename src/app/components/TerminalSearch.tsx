@@ -9,10 +9,9 @@ export default function TerminalSearch({
   const [, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState("");
   // TODO: If user is logged in, replace "guest" with their username
-  const username = "guest";
   return (
     <div className="flex items-center gap-2 text-gray-400">
-      <span>{username}@OOD:</span>
+      <span>@OOD:</span>
       <input
         ref={inputRef}
         type="text"
