@@ -1,11 +1,28 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User } from "../types/types";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function AccountManager() {
   const [user, setUser] = useState<User | null>(null);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check for stored user session
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    setIsAccountModalOpen(false);
+    router.push("/");
+  };
 
   return (
     <div className="relative">
@@ -28,13 +45,19 @@ export default function AccountManager() {
       {isAccountModalOpen && user && (
         <div className="absolute right-0 mt-2 w-48 border border-gray-800 bg-black/95 z-50">
           <div className="p-4 space-y-2">
+            <div className="text-gray-500 border-b border-gray-800 pb-2">
+              {user.email}
+            </div>
             <button className="w-full text-left text-green-500 hover:text-green-400">
               {"> "}Account Settings
             </button>
             <button className="w-full text-left text-gray-500 hover:text-gray-400">
               {"> "}Designs
             </button>
-            <button className="w-full text-left text-gray-500 hover:text-gray-400">
+            <button
+              onClick={handleLogout}
+              className="w-full text-left text-gray-500 hover:text-gray-400"
+            >
               {"> "}Log Out
             </button>
           </div>
