@@ -10,6 +10,42 @@ export default function LoginRegister() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const [password, setPassword] = useState("");
+  const [passwordChecks, setPasswordChecks] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false,
+  });
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+
+  const checkPassword = (pwd: string) => {
+    const checks = {
+      length: pwd.length >= 12,
+      uppercase: /[A-Z]/.test(pwd),
+      lowercase: /[a-z]/.test(pwd),
+      number: /[0-9]/.test(pwd),
+      special: /[^A-Za-z0-9]/.test(pwd),
+    };
+    setPasswordChecks(checks);
+    setIsPasswordValid(Object.values(checks).every((check) => check));
+  };
+
+  const validatePassword = (password: string) => {
+    const validations = {
+      length: password.length >= 12,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /[0-9]/.test(password),
+      special: /[^A-Za-z0-9]/.test(password),
+    };
+    return {
+      isValid: Object.values(validations).every((v) => v),
+      validations,
+    };
+  };
+
   const hashPassword = (password: string) => {
     return crypto
       .createHash("sha256")
@@ -62,6 +98,13 @@ export default function LoginRegister() {
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
 
+    const { isValid, validations } = validatePassword(password);
+    if (!isValid) {
+      setError("Password doesn't meet requirements");
+      setLoading(false);
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords don't match");
       setLoading(false);
@@ -88,7 +131,15 @@ export default function LoginRegister() {
         setError(data.error || "Registration failed");
       }
     } catch (err) {
-      setError("An error occurred during registration");
+      if (err instanceof Error && (err as any).response?.data?.details) {
+        setError(
+          (err as any).response.data.details
+            .map((d: any) => d.message)
+            .join(", ")
+        );
+      } else {
+        setError("An error occurred during registration");
+      }
     } finally {
       setLoading(false);
     }
@@ -177,13 +228,36 @@ export default function LoginRegister() {
                     placeholder="Email"
                     className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
                   />
-                  <input
-                    name="password"
-                    type="password"
-                    required
-                    placeholder="Password"
-                    className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
-                  />
+                  <div className="space-y-1">
+                    <input
+                      name="password"
+                      type="password"
+                      required
+                      placeholder="Password"
+                      className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        checkPassword(e.target.value);
+                      }}
+                    />
+                    <div className="text-sm space-y-1">
+                      {Object.entries({
+                        "longer than 12 characters": passwordChecks.length,
+                        "has uppercase letter": passwordChecks.uppercase,
+                        "has lowercase letter": passwordChecks.lowercase,
+                        "has number": passwordChecks.number,
+                        "has special character": passwordChecks.special,
+                      }).map(([text, check]) => (
+                        <div
+                          key={text}
+                          className={check ? "text-green-500" : "text-red-500"}
+                        >
+                          {check ? "- [x] " : "- [ ] "}
+                          {text}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                   <input
                     name="confirmPassword"
                     type="password"
@@ -193,8 +267,8 @@ export default function LoginRegister() {
                   />
                   <button
                     type="submit"
-                    disabled={loading}
-                    className="w-full p-2 bg-black border border-gray-800 text-green-500 hover:bg-gray-900 disabled:opacity-50"
+                    disabled={loading || !isPasswordValid}
+                    className="w-full p-2 bg-black border border-gray-800 text-green-500 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? "Loading..." : "> Register"}
                   </button>

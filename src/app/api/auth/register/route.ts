@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import { UserRole } from "@prisma/client";
-
+// TODO: Add email confirmation.
 const prisma = new PrismaClient();
 
 const registerSchema = z.object({
   email: z.string().email(),
   username: z.string().min(2),
-  password: z.string().min(8),
+  password: z.string().min(8), // Simplified validation for hashed password
 });
 
 export async function POST(request: Request) {

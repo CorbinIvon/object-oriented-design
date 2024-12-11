@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string().min(8), // Simplified validation for hashed password
 });
 
 export async function POST(request: Request) {
