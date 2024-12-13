@@ -60,22 +60,15 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl">Search Results for "{query}"</h1>
-        <button
-          onClick={handleCreateNew}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-        >
-          Create New Object
-        </button>
-      </div>
-
-      <div className="flex justify-between mb-4">
+    <div className="container mx-auto p-6 font-mono">
+      <div className="flex items-center gap-6 mb-4">
+        <p className="text-green-500">
+          {"> "}Search Results for "{query}"
+        </p>
         <select
           value={resultsPerPage}
           onChange={(e) => setResultsPerPage(Number(e.target.value))}
-          className="bg-gray-800 text-white p-2 rounded"
+          className="bg-black text-green-500 border-none focus:outline-none"
         >
           {[10, 20, 50, 100].map((num) => (
             <option key={num} value={num}>
@@ -85,34 +78,63 @@ export default function SearchPage() {
         </select>
       </div>
 
-      <div className="space-y-4">
+      <button
+        onClick={handleCreateNew}
+        className="text-green-500 hover:underline mb-4 block"
+      >
+        {"+ "}create new-object
+      </button>
+
+      {objectCounts.length > 20 && (
+        <div className="flex gap-4 mb-4">
+          {Array.from(
+            { length: Math.ceil(objectCounts.length / resultsPerPage) },
+            (_, i) => (
+              <span
+                key={i}
+                onClick={() => setPage(i + 1)}
+                className={`cursor-pointer ${
+                  page === i + 1
+                    ? "text-green-500"
+                    : "text-gray-500 hover:text-green-500"
+                }`}
+              >
+                [page {i + 1}]
+              </span>
+            )
+          )}
+        </div>
+      )}
+
+      <ul className="space-y-2 list-none">
         {objectCounts.map(({ name, count }) => (
-          <div
+          <li
             key={name}
             onClick={() => router.push(`/object/${name}`)}
-            className="p-4 bg-gray-800 rounded cursor-pointer hover:bg-gray-700"
+            className="text-green-500 cursor-pointer group relative"
           >
-            <h2 className="text-xl">
-              {name} ({count} implementation{count !== 1 ? "s" : ""})
-            </h2>
-          </div>
+            <span className="inline-block w-[1em] group-hover:hidden">-</span>
+            <span className="hidden group-hover:inline-block">&gt;&nbsp;</span>
+            {name} ({count} implementation{count !== 1 ? "s" : ""})
+          </li>
         ))}
-      </div>
+      </ul>
 
-      {/* Pagination */}
-      <div className="flex justify-center gap-2 mt-6">
+      <div className="flex gap-4 mt-6">
         {Array.from(
           { length: Math.ceil(objectCounts.length / resultsPerPage) },
           (_, i) => (
-            <button
+            <span
               key={i}
               onClick={() => setPage(i + 1)}
-              className={`px-4 py-2 rounded ${
-                page === i + 1 ? "bg-blue-600" : "bg-gray-800"
+              className={`cursor-pointer ${
+                page === i + 1
+                  ? "text-green-500"
+                  : "text-gray-500 hover:text-green-500"
               }`}
             >
-              {i + 1}
-            </button>
+              [page {i + 1}]
+            </span>
           )
         )}
       </div>

@@ -43,21 +43,31 @@ export default function ObjectPage({
   if (!data) return <div>Loading...</div>;
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">
-        "{params.objectName}" Implementations
-      </h1>
-
-      {data.objects.map((obj) => (
-        <div
-          key={obj.id}
-          onClick={() => router.push(`/object/${params.objectName}/${obj.id}`)}
-          className="bg-gray-800 p-6 rounded-lg mb-6 cursor-pointer hover:bg-gray-700"
-        >
-          <h2 className="text-xl mb-2">Created by {obj.creator.username}</h2>
-          <p className="text-gray-300 mb-4">{obj.description}</p>
-        </div>
-      ))}
+    <div className="container mx-auto font-mono">
+      <ul className="space-y-4 list-none">
+        {data.objects.map((obj) => (
+          <li
+            key={obj.id}
+            onClick={() =>
+              router.push(`/object/${params.objectName}/${obj.id}`)
+            }
+            className="text-green-500 cursor-pointer border-y border-green-500 group relative"
+          >
+            <p className="">
+              <span className="text-green-500 mb-2 ">
+                <span className="inline-block w-[1em] group-hover:hidden">
+                  -
+                </span>
+                <span className="hidden group-hover:inline-block">
+                  &gt;&nbsp;
+                </span>
+                created-by: {obj.creator.username}
+              </span>
+            </p>
+            <p className="text-gray-400 ml-4">{obj.description}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

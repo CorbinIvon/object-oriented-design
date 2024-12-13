@@ -1,7 +1,6 @@
 "use client";
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import Header from "../components/Header";
 import crypto from "crypto";
 
 export default function LoginRegister() {
@@ -146,137 +145,130 @@ export default function LoginRegister() {
   };
 
   return (
-    <div className="min-h-screen p-4 font-mono">
-      <div className="max-w-3xl mx-auto border border-gray-800 bg-black/50 px-6 py-2 rounded">
-        <div className="space-y-4">
-          <Header />
-          <div className="border border-gray-800 bg-black/50 p-4 rounded">
-            <div className="max-w-md mx-auto space-y-4">
-              <div className="flex gap-4 border-b border-gray-800">
-                <button
-                  onClick={() => setActiveTab("login")}
-                  className={`pb-2 ${
-                    activeTab === "login"
-                      ? "text-green-500"
-                      : "text-gray-500 hover:text-gray-400"
-                  }`}
-                >
-                  {"> "}Login
-                </button>
-                <button
-                  onClick={() => setActiveTab("register")}
-                  className={`pb-2 ${
-                    activeTab === "register"
-                      ? "text-green-500"
-                      : "text-gray-500 hover:text-gray-400"
-                  }`}
-                >
-                  {"> "}Register
-                </button>
-              </div>
-
-              {activeTab === "login" ? (
-                <form onSubmit={handleLogin} className="space-y-3">
-                  {error && <div className="text-red-500 text-sm">{error}</div>}
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="Email"
-                    className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
-                  />
-                  <input
-                    name="password"
-                    type="password"
-                    required
-                    placeholder="Password"
-                    className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
-                  />
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full p-2 bg-black border border-gray-800 text-green-500 hover:bg-gray-900 disabled:opacity-50"
-                  >
-                    {loading ? "Loading..." : "> Sign In"}
-                  </button>
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-800"></div>
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-black text-gray-500">Or</span>
-                    </div>
-                  </div>
-                  <button className="w-full p-2 border border-gray-800 text-gray-400 hover:bg-gray-900 flex items-center justify-center gap-2">
-                    {"> "}Sign In With Google
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleRegister} className="space-y-3">
-                  {error && <div className="text-red-500 text-sm">{error}</div>}
-                  <input
-                    name="username"
-                    type="text"
-                    required
-                    placeholder="Username"
-                    className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
-                  />
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="Email"
-                    className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
-                  />
-                  <div className="space-y-1">
-                    <input
-                      name="password"
-                      type="password"
-                      required
-                      placeholder="Password"
-                      className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
-                      onChange={(e) => {
-                        setPassword(e.target.value);
-                        checkPassword(e.target.value);
-                      }}
-                    />
-                    <div className="text-sm space-y-1">
-                      {Object.entries({
-                        "longer than 12 characters": passwordChecks.length,
-                        "has uppercase letter": passwordChecks.uppercase,
-                        "has lowercase letter": passwordChecks.lowercase,
-                        "has number": passwordChecks.number,
-                        "has special character": passwordChecks.special,
-                      }).map(([text, check]) => (
-                        <div
-                          key={text}
-                          className={check ? "text-green-500" : "text-red-500"}
-                        >
-                          {check ? "- [x] " : "- [ ] "}
-                          {text}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <input
-                    name="confirmPassword"
-                    type="password"
-                    required
-                    placeholder="Confirm Password"
-                    className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
-                  />
-                  <button
-                    type="submit"
-                    disabled={loading || !isPasswordValid}
-                    className="w-full p-2 bg-black border border-gray-800 text-green-500 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loading ? "Loading..." : "> Register"}
-                  </button>
-                </form>
-              )}
-            </div>
-          </div>
+    <div className="border border-gray-800 bg-black/50 p-4 rounded">
+      <div className="max-w-md mx-auto space-y-4">
+        <div className="flex gap-4 border-b border-gray-800">
+          <button
+            onClick={() => setActiveTab("login")}
+            className={`pb-2 ${
+              activeTab === "login"
+                ? "text-green-500"
+                : "text-gray-500 hover:text-gray-400"
+            }`}
+          >
+            {"> "}Login
+          </button>
+          <button
+            onClick={() => setActiveTab("register")}
+            className={`pb-2 ${
+              activeTab === "register"
+                ? "text-green-500"
+                : "text-gray-500 hover:text-gray-400"
+            }`}
+          >
+            {"> "}Register
+          </button>
         </div>
+
+        {activeTab === "login" ? (
+          <form onSubmit={handleLogin} className="space-y-3">
+            {error && <div className="text-red-500 text-sm">{error}</div>}
+            <input
+              name="email"
+              type="email"
+              required
+              placeholder="Email"
+              className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
+            />
+            <input
+              name="password"
+              type="password"
+              required
+              placeholder="Password"
+              className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full p-2 bg-black border border-gray-800 text-green-500 hover:bg-gray-900 disabled:opacity-50"
+            >
+              {loading ? "Loading..." : "> Sign In"}
+            </button>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-800"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-black text-gray-500">Or</span>
+              </div>
+            </div>
+            <button className="w-full p-2 border border-gray-800 text-gray-400 hover:bg-gray-900 flex items-center justify-center gap-2">
+              {"> "}Sign In With Google
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleRegister} className="space-y-3">
+            {error && <div className="text-red-500 text-sm">{error}</div>}
+            <input
+              name="username"
+              type="text"
+              required
+              placeholder="Username"
+              className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
+            />
+            <input
+              name="email"
+              type="email"
+              required
+              placeholder="Email"
+              className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
+            />
+            <div className="space-y-1">
+              <input
+                name="password"
+                type="password"
+                required
+                placeholder="Password"
+                className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  checkPassword(e.target.value);
+                }}
+              />
+              <div className="text-sm space-y-1">
+                {Object.entries({
+                  "longer than 12 characters": passwordChecks.length,
+                  "has uppercase letter": passwordChecks.uppercase,
+                  "has lowercase letter": passwordChecks.lowercase,
+                  "has number": passwordChecks.number,
+                  "has special character": passwordChecks.special,
+                }).map(([text, check]) => (
+                  <div
+                    key={text}
+                    className={check ? "text-green-500" : "text-red-500"}
+                  >
+                    {check ? "- [x] " : "- [ ] "}
+                    {text}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <input
+              name="confirmPassword"
+              type="password"
+              required
+              placeholder="Confirm Password"
+              className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
+            />
+            <button
+              type="submit"
+              disabled={loading || !isPasswordValid}
+              className="w-full p-2 bg-black border border-gray-800 text-green-500 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Loading..." : "> Register"}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
