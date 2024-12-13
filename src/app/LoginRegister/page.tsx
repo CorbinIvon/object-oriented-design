@@ -5,11 +5,16 @@ import crypto from "crypto";
 
 export default function LoginRegister() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    username: "",
+    confirmPassword: "",
+  });
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const [password, setPassword] = useState("");
   const [passwordChecks, setPasswordChecks] = useState({
     length: false,
     uppercase: false,
@@ -52,22 +57,29 @@ export default function LoginRegister() {
       .digest("hex");
   };
 
-  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    if (name === "password") {
+      checkPassword(value);
+    }
+  };
+
+  const handleLoginSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
 
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email,
-          password: hashPassword(password),
+          email: formData.email,
+          password: hashPassword(formData.password),
         }),
       });
 
@@ -91,20 +103,14 @@ export default function LoginRegister() {
     setError("");
     setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const username = formData.get("username") as string;
-    const password = formData.get("password") as string;
-    const confirmPassword = formData.get("confirmPassword") as string;
-
-    const { isValid, validations } = validatePassword(password);
+    const { isValid, validations } = validatePassword(formData.password);
     if (!isValid) {
       setError("Password doesn't meet requirements");
       setLoading(false);
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       setError("Passwords don't match");
       setLoading(false);
       return;
@@ -115,9 +121,9 @@ export default function LoginRegister() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email,
-          username,
-          password: hashPassword(password),
+          email: formData.email,
+          username: formData.username,
+          password: hashPassword(formData.password),
         }),
       });
 
@@ -145,7 +151,7 @@ export default function LoginRegister() {
   };
 
   return (
-    <div className="border border-gray-800 bg-black/50 p-4 rounded">
+    <div className=" bg-black/50 p-4 rounded">
       <div className="max-w-md mx-auto space-y-4">
         <div className="flex gap-4 border-b border-gray-800">
           <button
@@ -171,12 +177,14 @@ export default function LoginRegister() {
         </div>
 
         {activeTab === "login" ? (
-          <form onSubmit={handleLogin} className="space-y-3">
+          <form onSubmit={handleLoginSubmit} className="space-y-3">
             {error && <div className="text-red-500 text-sm">{error}</div>}
             <input
               name="email"
               type="email"
               required
+              value={formData.email}
+              onChange={handleInputChange}
               placeholder="Email"
               className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
             />
@@ -184,6 +192,8 @@ export default function LoginRegister() {
               name="password"
               type="password"
               required
+              value={formData.password}
+              onChange={handleInputChange}
               placeholder="Password"
               className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
             />
@@ -195,16 +205,16 @@ export default function LoginRegister() {
               {loading ? "Loading..." : "> Sign In"}
             </button>
             <div className="relative">
-              <div className="absolute inset-0 flex items-center">
+              {/* <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-800"></div>
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-black text-gray-500">Or</span>
-              </div>
+              </div> */}
             </div>
-            <button className="w-full p-2 border border-gray-800 text-gray-400 hover:bg-gray-900 flex items-center justify-center gap-2">
+            {/* <button className="w-full p-2 border border-gray-800 text-gray-400 hover:bg-gray-900 flex items-center justify-center gap-2">
               {"> "}Sign In With Google
-            </button>
+            </button> */}
           </form>
         ) : (
           <form onSubmit={handleRegister} className="space-y-3">
@@ -213,6 +223,8 @@ export default function LoginRegister() {
               name="username"
               type="text"
               required
+              value={formData.username}
+              onChange={handleInputChange}
               placeholder="Username"
               className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
             />
@@ -220,6 +232,8 @@ export default function LoginRegister() {
               name="email"
               type="email"
               required
+              value={formData.email}
+              onChange={handleInputChange}
               placeholder="Email"
               className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
             />
@@ -228,12 +242,10 @@ export default function LoginRegister() {
                 name="password"
                 type="password"
                 required
+                value={formData.password}
+                onChange={handleInputChange}
                 placeholder="Password"
                 className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  checkPassword(e.target.value);
-                }}
               />
               <div className="text-sm space-y-1">
                 {Object.entries({
@@ -257,6 +269,8 @@ export default function LoginRegister() {
               name="confirmPassword"
               type="password"
               required
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
               placeholder="Confirm Password"
               className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
             />
