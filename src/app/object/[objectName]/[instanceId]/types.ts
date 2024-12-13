@@ -24,3 +24,12 @@ export interface ObjectDetails {
     username: string;
   };
 }
+
+export interface AttributeUpdate {
+  id?: string;
+  name: string;
+  type: string;
+  description: string;
+  defaultValue?: string | null;
+  required: boolean;
+}

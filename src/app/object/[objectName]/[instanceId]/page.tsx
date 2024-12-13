@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState, use } from "react";
-import type { ObjectDetails } from "./types";
+import type { ObjectDetails, AttributeUpdate } from "./types";
 import ViewObject from "./view";
 import EditObject from "./edit";
+import EditAttributes from "./edit-attributes";
 
 export default function ObjectPage({
   params: paramsPromise,
@@ -12,6 +13,7 @@ export default function ObjectPage({
   const [object, setObject] = useState<ObjectDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingAttributes, setIsEditingAttributes] = useState(false);
   const params = use(paramsPromise);
 
   useEffect(() => {
@@ -62,12 +64,45 @@ export default function ObjectPage({
     }
   };
 
+  const handleAttributesSave = async (attributes: AttributeUpdate[]) => {
+    try {
+      const response = await fetch(
+        `/api/object/${params.objectName}/${params.instanceId}/attributes`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ attributes }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to update attributes");
+
+      const data = await response.json();
+      setObject(data.object);
+      setIsEditingAttributes(false);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to save attributes"
+      );
+    }
+  };
+
   if (error) return <div>Error: {error}</div>;
   if (!object) return <div>Loading...</div>;
 
   return isEditing ? (
     <EditObject object={object} onSave={handleSave} onCancel={handleCancel} />
+  ) : isEditingAttributes ? (
+    <EditAttributes
+      attributes={object.attributes}
+      onSave={handleAttributesSave}
+      onCancel={() => setIsEditingAttributes(false)}
+    />
   ) : (
-    <ViewObject object={object} onEdit={handleEdit} />
+    <ViewObject
+      object={object}
+      onEdit={handleEdit}
+      onEditAttributes={() => setIsEditingAttributes(true)}
+    />
   );
 }
