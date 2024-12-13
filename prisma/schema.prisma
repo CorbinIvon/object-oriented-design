@@ -45,26 +45,24 @@ model User {
 }
 
 model ObjectDef {
-  id          String            @id @default(uuid())
-  creatorId   String
-  creator     User             @relation(fields: [creatorId], references: [id])
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  name        String
-  version     String           @default("1.0")
-  description String
-  attributes  ObjectAttribute[]
-  methods     ObjectMethod[]
-  tags        TagsOnObjects[]
-  categories  String[]
-  fromRelationships Relationship[] @relation("FromObject")
-  toRelationships   Relationship[] @relation("ToObject")
+  id                String            @id @default(uuid())
+  creatorId         String
+  creator           User              @relation(fields: [creatorId], references: [id])
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  name              String
+  version           String            @default("1.0")
+  description       String
+  attributes        ObjectAttribute[]
+  methods           ObjectMethod[]
+  tags              TagsOnObjects[]
+  categories        String[]
+  fromRelationships Relationship[]    @relation("FromObject")
+  toRelationships   Relationship[]    @relation("ToObject")
   diagramElements   DiagramElement[]
-  comments         Comment[]
-  history          History[]
-  instances       Instance[]     // Added instances relationship
-
-  @@unique([creatorId, name, version])
+  comments          Comment[]
+  history           History[]
+  instances         Instance[]        // Added instances relationship
 }
 
 model Instance {
