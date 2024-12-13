@@ -30,6 +30,7 @@ export default function CreatePage() {
     const objectData = {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
+      version: formData.get("version") as string,
       creatorId: user.id,
     };
 
@@ -43,7 +44,11 @@ export default function CreatePage() {
       const data = await response.json();
 
       if (response.ok) {
-        router.push(`/object/${encodeURIComponent(data.object.name)}`);
+        router.push(
+          `/object/${encodeURIComponent(
+            data.object.creatorId
+          )}/${encodeURIComponent(data.object.name)}`
+        );
       } else {
         setError(data.error || "Failed to create object");
       }
@@ -72,6 +77,18 @@ export default function CreatePage() {
             type="text"
             required
             defaultValue={searchParams.get("name") || ""}
+            className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-gray-400">Version</label>
+          <input
+            name="version"
+            type="text"
+            required
+            placeholder="e.g., 1.0, 2.0-beta"
+            defaultValue="1.0"
             className="w-full p-2 bg-black border border-gray-800 text-green-500 focus:border-green-500 focus:outline-none"
           />
         </div>

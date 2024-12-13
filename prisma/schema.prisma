@@ -51,6 +51,7 @@ model ObjectDef {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   name        String
+  version     String           @default("1.0")
   description String
   attributes  ObjectAttribute[]
   methods     ObjectMethod[]
@@ -62,6 +63,8 @@ model ObjectDef {
   comments         Comment[]
   history          History[]
   instances       Instance[]     // Added instances relationship
+
+  @@unique([creatorId, name, version])
 }
 
 model Instance {
