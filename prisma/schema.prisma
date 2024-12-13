@@ -33,16 +33,18 @@ enum DiagramElementType {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  username  String
-  password  String
-  role      UserRole @default(VIEWER)
-  createdAt DateTime @default(now())
-  designs   Object[]
+  id           String          @id @default(uuid())
+  email        String         @unique
+  username     String
+  password     String
+  role         UserRole       @default(VIEWER)
+  createdAt    DateTime       @default(now())
+  objectDefs   ObjectDef[]    // Changed from designs to objectDefs
+  instances    Instance[]     // Added instances relationship
+  history      History[]      // Add this line
 }
 
-model Object {
+model ObjectDef {
   id          String            @id @default(uuid())
   creatorId   String
   creator     User             @relation(fields: [creatorId], references: [id])
@@ -59,14 +61,36 @@ model Object {
   diagramElements   DiagramElement[]
   comments         Comment[]
   history          History[]
+  instances       Instance[]     // Added instances relationship
+}
+
+model Instance {
+  id          String    @id @default(uuid())
+  objectDefId String    // Reference to the object definition
+  objectDef   ObjectDef @relation(fields: [objectDefId], references: [id])
+  creatorId   String
+  creator     User      @relation(fields: [creatorId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  name        String    // Instance name (can be different from objectDef name)
+  attributes  InstanceAttribute[]
+  comments    Comment[]
+}
+
+model InstanceAttribute {
+  id           String    @id @default(uuid())
+  instanceId   String
+  instance     Instance  @relation(fields: [instanceId], references: [id])
+  name         String    // Must match object definition attribute name
+  value        String    // The actual value for this instance
 }
 
 model Relationship {
   id          String           @id @default(uuid())
   fromObjectId String
   toObjectId   String
-  fromObject   Object          @relation("FromObject", fields: [fromObjectId], references: [id])
-  toObject     Object          @relation("ToObject", fields: [toObjectId], references: [id])
+  fromObject   ObjectDef          @relation("FromObject", fields: [fromObjectId], references: [id])
+  toObject     ObjectDef          @relation("ToObject", fields: [toObjectId], references: [id])
   type        RelationshipType
   description String?
 }
@@ -74,7 +98,7 @@ model Relationship {
 model ObjectAttribute {
   id           String  @id @default(uuid())
   objectId     String
-  object       Object  @relation(fields: [objectId], references: [id])
+  object       ObjectDef  @relation(fields: [objectId], references: [id])
   name         String
   type         String
   description  String
@@ -85,7 +109,7 @@ model ObjectAttribute {
 model ObjectMethod {
   id          String           @id @default(uuid())
   objectId    String
-  object      Object           @relation(fields: [objectId], references: [id])
+  object      ObjectDef           @relation(fields: [objectId], references: [id])
   name        String
   description String
   visibility  Visibility
@@ -113,7 +137,7 @@ model Tag {
 model TagsOnObjects {
   objectId    String
   tagId       String
-  object      Object     @relation(fields: [objectId], references: [id])
+  object      ObjectDef     @relation(fields: [objectId], references: [id])
   tag         Tag        @relation(fields: [tagId], references: [id])
 
   @@id([objectId, tagId])
@@ -122,10 +146,14 @@ model TagsOnObjects {
 model History {
   id        String   @id @default(uuid())
   objectId  String
-  object    Object   @relation(fields: [objectId], references: [id])
+  object    ObjectDef   @relation(fields: [objectId], references: [id], onDelete: Cascade)
   userId    String
+  user      User     @relation(fields: [userId], references: [id])
   timestamp DateTime @default(now())
   changes   String
+
+  @@index([objectId])
+  @@index([userId])
 }
 
 model Diagram {
@@ -144,19 +172,22 @@ model DiagramElement {
   diagramId String
   diagram   Diagram            @relation(fields: [diagramId], references: [id])
   objectId  String?
-  object    Object?            @relation(fields: [objectId], references: [id])
+  object    ObjectDef?            @relation(fields: [objectId], references: [id])
   type      DiagramElementType
   positionX Float
   positionY Float
 }
 
+// Update Comment model to support both ObjectDef and Instance
 model Comment {
-  id        String   @id @default(uuid())
-  objectId  String?
-  object    Object?  @relation(fields: [objectId], references: [id])
-  diagramId String?
-  diagram   Diagram? @relation(fields: [diagramId], references: [id])
-  userId    String
-  content   String
-  createdAt DateTime @default(now())
+  id          String    @id @default(uuid())
+  objectId    String?
+  object      ObjectDef? @relation(fields: [objectId], references: [id])
+  instanceId  String?
+  instance    Instance? @relation(fields: [instanceId], references: [id])
+  diagramId   String?
+  diagram     Diagram?  @relation(fields: [diagramId], references: [id])
+  userId      String
+  content     String
+  createdAt   DateTime  @default(now())
 }
