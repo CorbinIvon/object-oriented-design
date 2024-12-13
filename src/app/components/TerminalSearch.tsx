@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { fuzzySearch } from "@/utils/fuzzySearch";
-import SearchResults from "./SearchResults";
 import { useRouter } from "next/navigation";
 import { ObjectDef } from "@prisma/client";
 
@@ -70,9 +69,6 @@ export default function TerminalSearch({
           value={inputValue}
         />
       </div>
-      {showResults && inputValue && (
-        <SearchResults results={getSearchResults()} />
-      )}
     </div>
   );
 }
