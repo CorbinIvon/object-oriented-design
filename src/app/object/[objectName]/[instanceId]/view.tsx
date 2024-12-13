@@ -1,7 +1,16 @@
 import type { ObjectDetails } from "./types";
+import type { ObjectMethod, MethodParameter } from "@prisma/client";
+
+interface ObjectMethodWithParams extends ObjectMethod {
+  parameters: MethodParameter[];
+}
+
+interface ExtendedObjectDetails extends Omit<ObjectDetails, "methods"> {
+  methods: ObjectMethodWithParams[];
+}
 
 interface ViewObjectProps {
-  object: ObjectDetails;
+  object: ExtendedObjectDetails;
   onEdit: () => void;
   onEditAttributes: () => void;
   onEditMethods: () => void;
@@ -99,13 +108,47 @@ export default function ViewObject({
             Edit Methods
           </button>
         </div>
-        <div className="ml-4 space-y-2">
+        <div className="ml-4 space-y-4">
           {object.methods.map((method) => (
             <div key={method.id} className="text-gray-300">
-              <span className="text-blue-500">{method.name}</span>
-              <span className="text-gray-500">(): {method.returnType}</span>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`text-sm ${
+                    method.visibility === "PUBLIC"
+                      ? "text-green-500"
+                      : method.visibility === "PRIVATE"
+                      ? "text-red-500"
+                      : "text-yellow-500"
+                  }`}
+                >
+                  {method.visibility.toLowerCase()}
+                </span>
+                <span className="text-blue-500">{method.name}</span>
+                <span className="text-gray-500">
+                  (
+                  {method.parameters.map(
+                    (param: MethodParameter, idx: number) => (
+                      <span key={param.id}>
+                        {idx > 0 && ", "}
+                        <span className="text-yellow-500">{param.name}</span>
+                        <span className="text-gray-500">: {param.type}</span>
+                        {param.isOptional && (
+                          <span className="text-blue-500">?</span>
+                        )}
+                        {param.defaultValue && (
+                          <span className="text-gray-500">
+                            {" "}
+                            = {param.defaultValue}
+                          </span>
+                        )}
+                      </span>
+                    )
+                  )}
+                  ): {method.returnType}
+                </span>
+              </div>
               {method.description && (
-                <p className="text-gray-400 ml-4">{method.description}</p>
+                <p className="text-gray-400 ml-4 mt-1">{method.description}</p>
               )}
             </div>
           ))}
