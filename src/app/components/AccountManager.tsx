@@ -10,17 +10,34 @@ export default function AccountManager() {
   const router = useRouter();
 
   useEffect(() => {
-    // Check for stored user session
+    // Initial user check
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+
+    // Listen for user login/logout events
+    const handleUserChange = () => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      } else {
+        setUser(null);
+      }
+    };
+
+    window.addEventListener("userChange", handleUserChange);
+
+    return () => {
+      window.removeEventListener("userChange", handleUserChange);
+    };
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     setUser(null);
     setIsAccountModalOpen(false);
+    window.dispatchEvent(new Event("userChange"));
     router.push("/");
   };
 

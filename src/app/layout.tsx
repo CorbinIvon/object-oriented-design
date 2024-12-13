@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import TerminalWrapper from "./components/TerminalWrapper";
 
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
@@ -20,7 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={geistMono.variable}>
+        <TerminalWrapper>{children}</TerminalWrapper>
+      </body>
     </html>
   );
 }
