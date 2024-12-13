@@ -33,3 +33,20 @@ export interface AttributeUpdate {
   defaultValue?: string | null;
   required: boolean;
 }
+
+export interface MethodParameterUpdate {
+  id?: string;
+  name: string;
+  type: string;
+  defaultValue?: string | null;
+  isOptional: boolean;
+}
+
+export interface MethodUpdate {
+  id?: string;
+  name: string;
+  description: string;
+  visibility: "PUBLIC" | "PRIVATE" | "PROTECTED";
+  returnType: string | null;
+  parameters: MethodParameterUpdate[];
+}

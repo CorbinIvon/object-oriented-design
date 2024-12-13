@@ -4,12 +4,14 @@ interface ViewObjectProps {
   object: ObjectDetails;
   onEdit: () => void;
   onEditAttributes: () => void;
+  onEditMethods: () => void;
 }
 
 export default function ViewObject({
   object,
   onEdit,
   onEditAttributes,
+  onEditMethods,
 }: ViewObjectProps) {
   return (
     <div className="container mx-auto p-6 space-y-4">
@@ -88,7 +90,15 @@ export default function ViewObject({
       </section>
 
       <section className="border border-gray-800 bg-black/50 p-4 rounded">
-        <h2 className="text-green-500 mb-4">{"> "} Methods</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-green-500">{"> "} Methods</h2>
+          <button
+            onClick={onEditMethods}
+            className="px-3 py-1 text-sm text-green-500 border border-green-500 rounded hover:bg-green-500 hover:text-black transition-colors"
+          >
+            Edit Methods
+          </button>
+        </div>
         <div className="ml-4 space-y-2">
           {object.methods.map((method) => (
             <div key={method.id} className="text-gray-300">

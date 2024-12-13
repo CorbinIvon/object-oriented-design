@@ -76,7 +76,11 @@ export async function GET(
       },
       include: {
         attributes: true,
-        methods: true,
+        methods: {
+          include: {
+            parameters: true,
+          },
+        },
         creator: {
           select: {
             username: true,

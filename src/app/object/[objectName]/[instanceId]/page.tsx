@@ -1,19 +1,30 @@
 "use client";
 import { useEffect, useState, use } from "react";
-import type { ObjectDetails, AttributeUpdate } from "./types";
+import type { ObjectDetails, AttributeUpdate, MethodUpdate } from "./types";
+import type { ObjectMethod, MethodParameter } from "@prisma/client";
 import ViewObject from "./view";
 import EditObject from "./edit";
 import EditAttributes from "./edit-attributes";
+import EditMethods from "./edit-methods";
+
+interface ObjectMethodWithParams extends ObjectMethod {
+  parameters: MethodParameter[];
+}
+
+interface ExtendedObjectDetails extends Omit<ObjectDetails, "methods"> {
+  methods: ObjectMethodWithParams[];
+}
 
 export default function ObjectPage({
   params: paramsPromise,
 }: {
   params: Promise<{ objectName: string; instanceId: string }>;
 }) {
-  const [object, setObject] = useState<ObjectDetails | null>(null);
+  const [object, setObject] = useState<ExtendedObjectDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingAttributes, setIsEditingAttributes] = useState(false);
+  const [isEditingMethods, setIsEditingMethods] = useState(false);
   const params = use(paramsPromise);
 
   useEffect(() => {
@@ -87,6 +98,27 @@ export default function ObjectPage({
     }
   };
 
+  const handleMethodsSave = async (methods: MethodUpdate[]) => {
+    try {
+      const response = await fetch(
+        `/api/object/${params.objectName}/${params.instanceId}/methods`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ methods }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to update methods");
+
+      const data = await response.json();
+      setObject(data.object);
+      setIsEditingMethods(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save methods");
+    }
+  };
+
   if (error) return <div>Error: {error}</div>;
   if (!object) return <div>Loading...</div>;
 
@@ -98,11 +130,18 @@ export default function ObjectPage({
       onSave={handleAttributesSave}
       onCancel={() => setIsEditingAttributes(false)}
     />
+  ) : isEditingMethods ? (
+    <EditMethods
+      methods={object.methods}
+      onSave={handleMethodsSave}
+      onCancel={() => setIsEditingMethods(false)}
+    />
   ) : (
     <ViewObject
       object={object}
       onEdit={handleEdit}
       onEditAttributes={() => setIsEditingAttributes(true)}
+      onEditMethods={() => setIsEditingMethods(true)}
     />
   );
 }
