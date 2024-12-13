@@ -59,7 +59,9 @@ export default function ObjectPage({
             <p className="text-gray-400">
               created: {new Date(obj.createdAt).toLocaleString()}
             </p>
-            <p className="text-gray-400">by: {obj.creator.username}</p>
+            <p className="text-gray-400">
+              by: {obj.creator?.username ?? "Unknown"}
+            </p>
             <p className="mt-2">{obj.description}</p>
           </div>
         </section>

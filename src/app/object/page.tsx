@@ -115,7 +115,9 @@ export default function SearchPage() {
             {paginatedResults.map(({ name, count }, index) => (
               <li
                 key={name}
-                onClick={() => router.push(`/object/${name}`)}
+                onClick={() =>
+                  router.push(`/object/${encodeURIComponent(name)}`)
+                }
                 className="text-gray-300 cursor-pointer group hover:text-green-500 transition-colors p-2 rounded hover:bg-green-500/5"
               >
                 <span className="text-gray-500 mr-2">
