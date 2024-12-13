@@ -27,11 +27,40 @@ export default function ViewObject({ object, onEdit }: ViewObjectProps) {
           <p className="text-gray-400 mb-4">
             updated: {new Date(object.updatedAt).toLocaleString()}
           </p>
+          <p>Created by: {object.creator.username}</p>
           <p>{object.description}</p>
         </div>
       </section>
 
-      {/* Rest of the sections (Attributes, Methods, Relationships) remain the same */}
+      <section className="border border-gray-800 bg-black/50 p-4 rounded">
+        <h2 className="text-green-500 mb-4">{"> "} Attributes</h2>
+        <div className="ml-4 space-y-2">
+          {object.attributes.map((attr) => (
+            <div key={attr.id} className="text-gray-300">
+              <span className="text-yellow-500">{attr.name}</span>
+              <span className="text-gray-500">: {attr.type}</span>
+              {attr.description && (
+                <p className="text-gray-400 ml-4">{attr.description}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="border border-gray-800 bg-black/50 p-4 rounded">
+        <h2 className="text-green-500 mb-4">{"> "} Methods</h2>
+        <div className="ml-4 space-y-2">
+          {object.methods.map((method) => (
+            <div key={method.id} className="text-gray-300">
+              <span className="text-blue-500">{method.name}</span>
+              <span className="text-gray-500">(): {method.returnType}</span>
+              {method.description && (
+                <p className="text-gray-400 ml-4">{method.description}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
