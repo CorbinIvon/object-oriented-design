@@ -1,27 +1,34 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
+import { useRouter } from "next/navigation";
 import type { ObjectDef, Instance } from "@prisma/client";
 
+interface ObjectWithUser extends ObjectDef {
+  creator: {
+    username: string;
+  };
+}
+
 interface ObjectData {
-  objectDef: ObjectDef;
-  instances: Instance[];
+  objects: ObjectWithUser[];
+  instances: { [objectId: string]: Instance[] };
 }
 
 export default function ObjectPage({
-  params,
+  params: paramsPromise,
 }: {
-  params: { objectName: string };
+  params: Promise<{ objectName: string }>;
 }) {
+  const router = useRouter();
   const [data, setData] = useState<ObjectData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const params = use(paramsPromise);
 
   useEffect(() => {
-    async function fetchObject() {
+    async function fetchObjects() {
       try {
-        const response = await fetch(`/api/objects/${params.objectName}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch object");
-        }
+        const response = await fetch(`/api/objects/name/${params.objectName}`);
+        if (!response.ok) throw new Error("Failed to fetch objects");
         const data = await response.json();
         setData(data);
       } catch (err) {
@@ -29,7 +36,7 @@ export default function ObjectPage({
       }
     }
 
-    fetchObject();
+    fetchObjects();
   }, [params.objectName]);
 
   if (error) return <div>Error: {error}</div>;
@@ -37,23 +44,20 @@ export default function ObjectPage({
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">{data.objectDef.name}</h1>
-      <div className="bg-gray-800 p-6 rounded-lg mb-6">
-        <h2 className="text-xl mb-2">Description</h2>
-        <p className="text-gray-300">{data.objectDef.description}</p>
-      </div>
+      <h1 className="text-3xl font-bold mb-6">
+        "{params.objectName}" Implementations
+      </h1>
 
-      <div className="mb-6">
-        <h2 className="text-2xl mb-4">Instances ({data.instances.length})</h2>
-        <div className="grid gap-4">
-          {data.instances.map((instance) => (
-            <div key={instance.id} className="bg-gray-800 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold">{instance.name}</h3>
-              <p className="text-sm text-gray-400">ID: {instance.id}</p>
-            </div>
-          ))}
+      {data.objects.map((obj) => (
+        <div
+          key={obj.id}
+          onClick={() => router.push(`/object/${params.objectName}/${obj.id}`)}
+          className="bg-gray-800 p-6 rounded-lg mb-6 cursor-pointer hover:bg-gray-700"
+        >
+          <h2 className="text-xl mb-2">Created by {obj.creator.username}</h2>
+          <p className="text-gray-300 mb-4">{obj.description}</p>
         </div>
-      </div>
+      ))}
     </div>
   );
 }

@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 const updateObjectSchema = z.object({
   name: z.string().min(1).max(100),
@@ -12,8 +10,9 @@ const updateObjectSchema = z.object({
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { objectName: string; instanceId: string } }
+  context: { params: Promise<{ objectName: string; instanceId: string }> }
 ) {
+  const params = await context.params;
   try {
     const body = await request.json();
     const { name, description, userId } = updateObjectSchema.parse(body);
@@ -57,5 +56,44 @@ export async function PATCH(
     return NextResponse.json({ object: updatedObject });
   } catch (error) {
     // ...existing error handling code...
+  }
+}
+
+export async function GET(
+  request: Request,
+  context: { params: Promise<{ objectName: string; instanceId: string }> }
+) {
+  const params = await context.params;
+
+  try {
+    const object = await prisma.objectDef.findUnique({
+      where: {
+        id: params.instanceId,
+      },
+      include: {
+        instances: {
+          include: {
+            attributes: true,
+          },
+        },
+        creator: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
+
+    if (!object) {
+      return NextResponse.json({ error: "Object not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ object });
+  } catch (error) {
+    console.error("Error details:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch object" },
+      { status: 500 }
+    );
   }
 }

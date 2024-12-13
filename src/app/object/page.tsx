@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import { fuzzySearch } from "@/utils/fuzzySearch";
 import type { ObjectDef } from "@prisma/client";
 
-type ScoredObject = ObjectDef & {
-  score: number;
+type ObjectCount = {
+  name: string;
+  count: number;
 };
 
 export default function SearchPage() {
@@ -14,7 +15,8 @@ export default function SearchPage() {
   const query = searchParams.get("q") || "";
   const [page, setPage] = useState(1);
   const [resultsPerPage, setResultsPerPage] = useState(20);
-  const [objects, setObjects] = useState<ScoredObject[]>([]);
+  const [objectCounts, setObjectCounts] = useState<ObjectCount[]>([]);
+  const [userId] = useState("00000000-0000-0000-0000-000000000000"); // Temporary user ID
 
   useEffect(() => {
     async function fetchObjects() {
@@ -25,32 +27,36 @@ export default function SearchPage() {
       );
       const data = await response.json();
 
-      const scoredObjects = data.objects
-        .map((obj: ObjectDef) => ({
-          ...obj,
-          score: fuzzySearch(query, obj.name),
-        }))
-        .filter((obj: ScoredObject) => obj.score > 0)
-        .sort((a: ScoredObject, b: ScoredObject) => b.score - a.score);
+      // Group and count objects by name with proper typing
+      const counts: ObjectCount[] = Object.entries(
+        data.objects.reduce(
+          (acc: { [key: string]: number }, obj: ObjectDef) => {
+            const score = fuzzySearch(query, obj.name);
+            if (score > 0) {
+              acc[obj.name] = (acc[obj.name] || 0) + 1;
+            }
+            return acc;
+          },
+          {}
+        )
+      ).map(
+        ([name, count]): ObjectCount => ({
+          name,
+          count: count as number,
+        })
+      );
 
-      setObjects(scoredObjects);
+      setObjectCounts(counts);
     }
 
     fetchObjects();
   }, [query]);
 
-  const paginatedResults = objects.slice(
-    (page - 1) * resultsPerPage,
-    page * resultsPerPage
-  );
-
-  const handleResultClick = (result: ObjectDef) => {
-    router.push(`/object/${result.name}`);
-  };
-
   const handleCreateNew = () => {
     const objectName = query.trim() || "NewObject";
-    router.push(`/create?name=${encodeURIComponent(objectName)}`);
+    router.push(
+      `/create?name=${encodeURIComponent(objectName)}&creatorId=${userId}`
+    );
   };
 
   return (
@@ -80,14 +86,15 @@ export default function SearchPage() {
       </div>
 
       <div className="space-y-4">
-        {paginatedResults.map((result) => (
+        {objectCounts.map(({ name, count }) => (
           <div
-            key={result.id}
-            onClick={() => handleResultClick(result)}
-            className="cursor-pointer p-4 bg-gray-800 rounded hover:bg-gray-700"
+            key={name}
+            onClick={() => router.push(`/object/${name}`)}
+            className="p-4 bg-gray-800 rounded cursor-pointer hover:bg-gray-700"
           >
-            <h2 className="text-xl">{result.name}</h2>
-            <p className="text-gray-400">{result.description}</p>
+            <h2 className="text-xl">
+              {name} ({count} implementation{count !== 1 ? "s" : ""})
+            </h2>
           </div>
         ))}
       </div>
@@ -95,7 +102,7 @@ export default function SearchPage() {
       {/* Pagination */}
       <div className="flex justify-center gap-2 mt-6">
         {Array.from(
-          { length: Math.ceil(objects.length / resultsPerPage) },
+          { length: Math.ceil(objectCounts.length / resultsPerPage) },
           (_, i) => (
             <button
               key={i}

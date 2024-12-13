@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import { UserRole } from "@prisma/client";
-// TODO: Add email confirmation.
+import bcrypt from "bcrypt";
+
 const prisma = new PrismaClient();
 
 const registerSchema = z.object({
@@ -30,12 +31,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
     // Create new user
     const user = await prisma.user.create({
       data: {
         email,
         username,
-        password,
+        password: hashedPassword,
         role: UserRole.VIEWER,
       },
       select: {
@@ -47,7 +51,13 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ user }, { status: 201 });
+    return NextResponse.json(
+      {
+        message: "User registered successfully",
+        user,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Registration error:", error);
 
