@@ -61,9 +61,16 @@ export default function SearchPage() {
 
   return (
     <div className="container mx-auto p-6 font-mono">
-      <div className="flex items-center gap-6 mb-4">
+      <button
+        onClick={handleCreateNew}
+        className="text-green-500 hover:underline block"
+      >
+        {"+ "}create new-object
+      </button>
+
+      <div className="flex items-center gap-6 ">
         <p className="text-green-500">
-          {"> "}Search Results for "{query}"
+          {"# "}Search Results: "{query}"
         </p>
         <select
           value={resultsPerPage}
@@ -77,13 +84,6 @@ export default function SearchPage() {
           ))}
         </select>
       </div>
-
-      <button
-        onClick={handleCreateNew}
-        className="text-green-500 hover:underline mb-4 block"
-      >
-        {"+ "}create new-object
-      </button>
 
       {objectCounts.length > 20 && (
         <div className="flex gap-4 mb-4">

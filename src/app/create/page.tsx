@@ -43,12 +43,8 @@ export default function CreatePage() {
 
       const data = await response.json();
 
-      if (response.ok) {
-        router.push(
-          `/object/${encodeURIComponent(
-            data.object.creatorId
-          )}/${encodeURIComponent(data.object.name)}`
-        );
+      if (response.ok && data.object) {
+        router.push(`/object/${data.object.name}/${data.object.id}`);
       } else {
         setError(data.error || "Failed to create object");
       }

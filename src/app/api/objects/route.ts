@@ -1,25 +1,29 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 const createObjectSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().min(1),
+  version: z.string().min(1),
   creatorId: z.string().uuid(),
 });
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, description, creatorId } = createObjectSchema.parse(body);
+    const { name, description, version, creatorId } =
+      createObjectSchema.parse(body);
 
-    // Check if object with same name exists (case insensitive)
+    // Check if object with same name and version exists (case insensitive)
     const existingObject = await prisma.objectDef.findFirst({
       where: {
         name: {
           equals: name,
+          mode: "insensitive",
+        },
+        version: {
+          equals: version,
           mode: "insensitive",
         },
       },
@@ -27,7 +31,7 @@ export async function POST(request: Request) {
 
     if (existingObject) {
       return NextResponse.json(
-        { error: "An object with this name already exists" },
+        { error: "An object with this name and version already exists" },
         { status: 400 }
       );
     }
@@ -49,6 +53,7 @@ export async function POST(request: Request) {
       data: {
         name,
         description,
+        version,
         creatorId,
         categories: [],
       },
@@ -63,7 +68,16 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ object }, { status: 201 });
+    return NextResponse.json(
+      {
+        object: {
+          id: object.id,
+          name: object.name,
+          creatorId: object.creatorId,
+        },
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Object creation error:", error);
 
