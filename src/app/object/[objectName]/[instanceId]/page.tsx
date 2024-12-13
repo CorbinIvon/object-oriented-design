@@ -41,21 +41,21 @@ export default function ObjectPage({
   const handleEdit = () => setIsEditing(true);
   const handleCancel = () => setIsEditing(false);
 
-  const handleSave = async (updatedDescription: string) => {
+  const handleSave = async (description: string) => {
     try {
       const response = await fetch(
         `/api/object/${params.objectName}/${params.instanceId}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ description: updatedDescription }),
+          body: JSON.stringify({ description }),
         }
       );
 
       if (!response.ok) throw new Error("Failed to update object");
 
-      const updatedObject = await response.json();
-      setObject(updatedObject);
+      const data = await response.json();
+      setObject(data.object);
       setIsEditing(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save changes");
