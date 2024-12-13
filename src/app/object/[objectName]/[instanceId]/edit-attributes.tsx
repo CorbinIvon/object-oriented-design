@@ -57,63 +57,89 @@ export default function EditAttributes({
     <div className="container mx-auto p-6 space-y-4">
       <section className="border border-gray-800 bg-black/50 p-4 rounded">
         <h2 className="text-green-500 mb-4">{"> "} Edit Attributes</h2>
-        <div className="space-y-4">
-          {attrs.map((attr, index) => (
-            <div key={index} className="grid grid-cols-6 gap-4 items-start">
-              <input
-                type="text"
-                value={attr.name}
-                onChange={(e) => updateAttribute(index, "name", e.target.value)}
-                placeholder="Name"
-                className="col-span-1 bg-black/30 text-gray-300 border border-gray-700 rounded p-2"
-              />
-              <input
-                type="text"
-                value={attr.type}
-                onChange={(e) => updateAttribute(index, "type", e.target.value)}
-                placeholder="Type"
-                className="col-span-1 bg-black/30 text-gray-300 border border-gray-700 rounded p-2"
-              />
-              <input
-                type="text"
-                value={attr.defaultValue || ""}
-                onChange={(e) =>
-                  updateAttribute(index, "defaultValue", e.target.value)
-                }
-                placeholder="Default Value"
-                className="col-span-1 bg-black/30 text-gray-300 border border-gray-700 rounded p-2"
-              />
-              <div className="col-span-1 flex items-center">
-                <label className="flex items-center gap-2 text-gray-300">
+        <table className="w-full">
+          <thead>
+            <tr className="text-gray-400 text-sm">
+              <th className="text-left p-2">Name</th>
+              <th className="text-left p-2">Type</th>
+              <th className="text-left p-2">Default</th>
+              <th className="text-left p-2">Nullable</th>
+              <th className="text-left p-2">Description</th>
+              <th className="text-left p-2"></th>
+            </tr>
+          </thead>
+          <tbody className="space-y-2">
+            {attrs.map((attr, index) => (
+              <tr key={index} className="border-t border-gray-800">
+                <td className="p-2">
                   <input
-                    type="checkbox"
-                    checked={attr.required}
+                    type="text"
+                    value={attr.name}
                     onChange={(e) =>
-                      updateAttribute(index, "required", e.target.checked)
+                      updateAttribute(index, "name", e.target.value)
                     }
-                    className="bg-black/30 border border-gray-700 rounded"
+                    placeholder="Name"
+                    className="w-full bg-black/30 text-gray-300 border border-gray-700 rounded p-2"
                   />
-                  Required
-                </label>
-              </div>
-              <input
-                type="text"
-                value={attr.description}
-                onChange={(e) =>
-                  updateAttribute(index, "description", e.target.value)
-                }
-                placeholder="Description"
-                className="col-span-1 bg-black/30 text-gray-300 border border-gray-700 rounded p-2"
-              />
-              <button
-                onClick={() => removeAttribute(index)}
-                className="col-span-1 px-3 py-1 text-sm text-red-500 border border-red-500 rounded hover:bg-red-500 hover:text-black"
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-        </div>
+                </td>
+                <td className="p-2">
+                  <input
+                    type="text"
+                    value={attr.type}
+                    onChange={(e) =>
+                      updateAttribute(index, "type", e.target.value)
+                    }
+                    placeholder="Type"
+                    className="w-full bg-black/30 text-gray-300 border border-gray-700 rounded p-2"
+                  />
+                </td>
+                <td className="p-2">
+                  <input
+                    type="text"
+                    value={attr.defaultValue || ""}
+                    onChange={(e) =>
+                      updateAttribute(index, "defaultValue", e.target.value)
+                    }
+                    placeholder="Default Value"
+                    className="w-full bg-black/30 text-gray-300 border border-gray-700 rounded p-2"
+                  />
+                </td>
+                <td className="p-2">
+                  <label className="flex items-center gap-2 text-gray-300">
+                    <input
+                      type="checkbox"
+                      checked={!attr.required}
+                      onChange={(e) =>
+                        updateAttribute(index, "required", !e.target.checked)
+                      }
+                      className="bg-black/30 border border-gray-700 rounded"
+                    />
+                    Nullable
+                  </label>
+                </td>
+                <td className="p-2">
+                  <input
+                    type="text"
+                    value={attr.description}
+                    onChange={(e) =>
+                      updateAttribute(index, "description", e.target.value)
+                    }
+                    placeholder="Description"
+                    className="w-full bg-black/30 text-gray-300 border border-gray-700 rounded p-2"
+                  />
+                </td>
+                <td className="p-2">
+                  <button
+                    onClick={() => removeAttribute(index)}
+                    className="px-3 py-1 text-sm text-red-500 border border-red-500 rounded hover:bg-red-500 hover:text-black"
+                  >
+                    Remove
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
         <button
           onClick={addAttribute}
           className="mt-4 px-3 py-1 text-sm text-green-500 border border-green-500 rounded hover:bg-green-500 hover:text-black"
