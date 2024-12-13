@@ -1,32 +1,27 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { objectName: string } }
-) {
-  try {
-    const objects = await prisma.objectDef.findMany({
-      where: {
-        name: params.objectName,
-      },
-      include: {
-        creator: {
-          select: {
-            username: true,
-          },
+export async function GET(request: NextRequest) {
+  // Extract objectName from URL path
+  const objectName = request.url.split("/").pop();
+
+  if (!objectName) {
+    return NextResponse.json({ objects: [] });
+  }
+
+  const objects = await prisma.objectDef.findMany({
+    where: {
+      name: decodeURIComponent(objectName),
+    },
+    include: {
+      creator: {
+        select: {
+          username: true,
         },
       },
-    });
+      instances: true,
+    },
+  });
 
-    return NextResponse.json({
-      objects,
-    });
-  } catch (error) {
-    console.error("Error fetching objects:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch objects" },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({ objects });
 }
