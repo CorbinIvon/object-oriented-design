@@ -50,7 +50,7 @@ export default function TerminalSearch({
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && inputValue.trim()) {
-      router.push(`/search?q=${encodeURIComponent(inputValue.trim())}`);
+      router.push(`/object?q=${encodeURIComponent(inputValue.trim())}`);
     }
   };
 

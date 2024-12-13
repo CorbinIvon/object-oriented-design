@@ -3,18 +3,18 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { name: string } }
+  { params }: { params: { objectName: string } }
 ) {
-  const { name } = params;
+  const { objectName } = params;
 
   try {
     const objectDef = await prisma.objectDef.findFirst({
-      where: { name },
+      where: { name: objectName },
     });
 
     if (!objectDef) {
       return NextResponse.json(
-        { error: `No object definition found with name "${name}"` },
+        { error: `No object definition found with name "${objectName}"` },
         { status: 404 }
       );
     }

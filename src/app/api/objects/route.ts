@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     const { name, description, creatorId } = createObjectSchema.parse(body);
 
     // Check if object with same name exists (case insensitive)
-    const existingObject = await prisma.object.findFirst({
+    const existingObject = await prisma.objectDef.findFirst({
       where: {
         name: {
           equals: name,
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     }
 
     // Create the object
-    const object = await prisma.object.create({
+    const object = await prisma.objectDef.create({
       data: {
         name,
         description,

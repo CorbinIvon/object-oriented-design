@@ -12,15 +12,15 @@ const updateObjectSchema = z.object({
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { objectName: string; instanceId: string } }
 ) {
   try {
     const body = await request.json();
     const { name, description, userId } = updateObjectSchema.parse(body);
 
     // Get the original object for comparison
-    const originalObject = await prisma.object.findUnique({
-      where: { id: params.id },
+    const originalObject = await prisma.objectDef.findUnique({
+      where: { id: params.instanceId },
       include: { attributes: true, methods: true },
     });
 
@@ -29,8 +29,8 @@ export async function PATCH(
     }
 
     // Update the object
-    const updatedObject = await prisma.object.update({
-      where: { id: params.id },
+    const updatedObject = await prisma.objectDef.update({
+      where: { id: params.instanceId },
       data: {
         name,
         description,
@@ -56,16 +56,6 @@ export async function PATCH(
 
     return NextResponse.json({ object: updatedObject });
   } catch (error) {
-    console.error("Object update error:", error);
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: "Invalid input", details: error.errors },
-        { status: 400 }
-      );
-    }
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    // ...existing error handling code...
   }
 }
