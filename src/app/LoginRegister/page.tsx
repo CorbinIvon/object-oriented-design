@@ -1,7 +1,7 @@
 "use client";
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import crypto from "crypto";
+import { hashPassword } from "@/utils/auth";
 
 export default function LoginRegister() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
@@ -50,13 +50,6 @@ export default function LoginRegister() {
     };
   };
 
-  const hashPassword = (password: string) => {
-    return crypto
-      .createHash("sha256")
-      .update(password + process.env.DATABASE_URL)
-      .digest("hex");
-  };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -87,6 +80,7 @@ export default function LoginRegister() {
 
       if (response.ok) {
         localStorage.setItem("user", JSON.stringify(data.user));
+        window.dispatchEvent(new Event("userChange"));
         router.push("/");
       } else {
         setError(data.error || "Login failed");
@@ -131,6 +125,7 @@ export default function LoginRegister() {
 
       if (response.ok) {
         localStorage.setItem("user", JSON.stringify(data.user));
+        window.dispatchEvent(new Event("userChange"));
         router.push("/");
       } else {
         setError(data.error || "Registration failed");

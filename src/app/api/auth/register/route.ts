@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     }
 
     // Hash password
-    const hashedPassword = await hashPassword(password);
+    const hashedPassword = hashPassword(password);
 
     // Create new user
     const user = await prisma.user.create({

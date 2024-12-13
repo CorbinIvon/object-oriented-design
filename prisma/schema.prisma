@@ -33,15 +33,15 @@ enum DiagramElementType {
 }
 
 model User {
-  id           String          @id @default(uuid())
-  email        String         @unique
-  username     String
+  id           String     @id @default(uuid())
+  email        String     @unique
+  username     String     @unique
   password     String
-  role         UserRole       @default(VIEWER)
-  createdAt    DateTime       @default(now())
-  objectDefs   ObjectDef[]    // Changed from designs to objectDefs
-  instances    Instance[]     // Added instances relationship
-  history      History[]      // Add this line
+  role         UserRole   @default(VIEWER)
+  createdAt    DateTime   @default(now())
+  objectDefs   ObjectDef[]
+  instances    Instance[]
+  history      History[]
 }
 
 model ObjectDef {

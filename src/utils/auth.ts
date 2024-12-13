@@ -1,7 +1,8 @@
-import bcrypt from "bcrypt";
+import crypto from "crypto";
 
-const SALT_ROUNDS = 10;
-
-export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, SALT_ROUNDS);
+export function hashPassword(password: string): string {
+  return crypto
+    .createHash("sha256")
+    .update(password + process.env.DATABASE_URL)
+    .digest("hex");
 }
