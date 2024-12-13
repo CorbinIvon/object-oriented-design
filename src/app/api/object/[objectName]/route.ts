@@ -25,7 +25,8 @@ export async function GET(
     });
 
     return NextResponse.json({ objectDef, instances });
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error("Error fetching object data:", error);
     return NextResponse.json(
       { error: "Failed to fetch object data" },
       { status: 500 }
