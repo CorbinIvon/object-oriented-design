@@ -43,31 +43,27 @@ export default function ObjectPage({
   if (!data) return <div>Loading...</div>;
 
   return (
-    <div className="container mx-auto font-mono">
-      <ul className="list-none">
-        {data.objects.map((obj) => (
-          <li
-            key={obj.id}
-            onClick={() =>
-              router.push(`/object/${params.objectName}/${obj.id}`)
-            }
-            className="text-green-500 cursor-pointer border-y border-green-500 group relative"
-          >
-            <p className="">
-              <span className="text-green-500 mb-2 ">
-                <span className="inline-block w-[1em] group-hover:hidden">
-                  -
-                </span>
-                <span className="hidden group-hover:inline-block">
-                  &gt;&nbsp;
-                </span>
-                created-by: {obj.creator.username}
-              </span>
+    <div className="container mx-auto p-6 space-y-4">
+      {data.objects.map((obj) => (
+        <section
+          key={obj.id}
+          onClick={() => router.push(`/object/${params.objectName}/${obj.id}`)}
+          className="border border-gray-800 bg-black/50 p-4 rounded cursor-pointer hover:border-green-500 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-green-500">{">"}</span>
+            <span className="text-yellow-500">{obj.name}</span>
+            <span className="text-gray-500">version {obj.version}</span>
+          </div>
+          <div className="ml-4 text-gray-300">
+            <p className="text-gray-400">
+              created: {new Date(obj.createdAt).toLocaleString()}
             </p>
-            <p className="text-gray-400 ml-4">{obj.description}</p>
-          </li>
-        ))}
-      </ul>
+            <p className="text-gray-400">by: {obj.creator.username}</p>
+            <p className="mt-2">{obj.description}</p>
+          </div>
+        </section>
+      ))}
     </div>
   );
 }
