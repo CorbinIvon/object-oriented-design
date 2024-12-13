@@ -48,9 +48,22 @@ export default function SearchPage() {
     router.push(`/object/${result.name}`);
   };
 
+  const handleCreateNew = () => {
+    const objectName = query.trim() || "NewObject";
+    router.push(`/create?name=${encodeURIComponent(objectName)}`);
+  };
+
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl mb-4">Search Results for "{query}"</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl">Search Results for "{query}"</h1>
+        <button
+          onClick={handleCreateNew}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+        >
+          Create New Object
+        </button>
+      </div>
 
       <div className="flex justify-between mb-4">
         <select
