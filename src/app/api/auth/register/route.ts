@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import { UserRole } from "@prisma/client";
-import bcrypt from "bcrypt";
+import { hashPassword } from "@/utils/auth";
 
 const prisma = new PrismaClient();
 
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await hashPassword(password);
 
     // Create new user
     const user = await prisma.user.create({

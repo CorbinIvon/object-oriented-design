@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
+import { hashPassword } from "@/utils/auth";
 
 const prisma = new PrismaClient();
 
@@ -14,27 +15,30 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { email, password } = loginSchema.parse(body);
 
-    const user = await prisma.user.findUnique({
-      where: { email },
+    const hashedPassword = await hashPassword(password);
+
+    const user = await prisma.user.findFirst({
+      where: {
+        email,
+        password: hashedPassword,
+      },
       select: {
         id: true,
         email: true,
         username: true,
-        password: true,
         role: true,
         createdAt: true,
       },
     });
 
-    if (!user || user.password !== password) {
+    if (!user) {
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 }
       );
     }
 
-    const { password: _, ...userWithoutPassword } = user;
-    return NextResponse.json({ user: userWithoutPassword });
+    return NextResponse.json({ user });
   } catch (error) {
     console.error("Login error:", error);
 
