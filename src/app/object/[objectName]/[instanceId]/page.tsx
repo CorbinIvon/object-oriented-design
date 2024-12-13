@@ -58,82 +58,92 @@ export default function ObjectPage({
   if (!object) return <div>Loading...</div>;
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-2">{object.name}</h1>
-      <p className="text-gray-400 mb-6">
-        Created by {object.creator?.username || "Unknown"}
-      </p>
-
-      <div className="bg-gray-800 p-6 rounded-lg mb-6">
-        <h2 className="text-xl mb-2">Description</h2>
-        <p className="text-gray-300">{object.description}</p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-gray-800 p-6 rounded-lg">
-          <h2 className="text-xl mb-4">Attributes</h2>
-          <div className="space-y-3">
-            {(object.attributes || []).map((attr) => (
-              <div key={attr.id} className="bg-gray-700 p-3 rounded">
-                <div className="font-semibold">
-                  {attr.name}: {attr.type}
-                </div>
-                <div className="text-sm text-gray-400">{attr.description}</div>
-                {attr.defaultValue && (
-                  <div className="text-sm text-gray-400">
-                    Default: {attr.defaultValue}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+    <div className="container mx-auto p-6 space-y-4">
+      <section className="border border-gray-800 bg-black/50 p-4 rounded">
+        <p className="text-green-500 mb-2">{"> "} Object Information</p>
+        <div className="ml-4 text-gray-300">
+          <h1 className="text-xl font-bold mb-1">{object.name}</h1>
+          <p className="text-gray-400">
+            Created by {object.creator?.username || "Unknown"}
+          </p>
+          <p className="mt-2">{object.description}</p>
         </div>
+      </section>
 
-        <div className="bg-gray-800 p-6 rounded-lg">
-          <h2 className="text-xl mb-4">Methods</h2>
-          <div className="space-y-3">
-            {(object.methods || []).map((method) => (
-              <div key={method.id} className="bg-gray-700 p-3 rounded">
-                <div className="font-semibold">
-                  {method.name}(): {method.returnType || "void"}
-                </div>
-                <div className="text-sm text-gray-400">
-                  {method.description}
-                </div>
-                <div className="text-sm text-blue-400">{method.visibility}</div>
+      <section className="border border-gray-800 bg-black/50 p-4 rounded">
+        <p className="text-green-500 mb-2">{"> "} Attributes</p>
+        <div className="ml-4 space-y-2">
+          {(object.attributes || []).map((attr) => (
+            <div key={attr.id} className="text-gray-300">
+              <div className="font-mono">
+                {attr.name}: <span className="text-blue-400">{attr.type}</span>
               </div>
-            ))}
-          </div>
+              <div className="text-sm text-gray-400 ml-4">
+                {attr.description}
+              </div>
+              {attr.defaultValue && (
+                <div className="text-sm text-gray-400 ml-4">
+                  Default: {attr.defaultValue}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
-      </div>
+      </section>
 
-      <div className="bg-gray-800 p-6 rounded-lg mt-6">
-        <h2 className="text-xl mb-4">Relationships</h2>
-        <div className="space-y-3">
+      <section className="border border-gray-800 bg-black/50 p-4 rounded">
+        <p className="text-green-500 mb-2">{"> "} Methods</p>
+        <div className="ml-4 space-y-2">
+          {(object.methods || []).map((method) => (
+            <div key={method.id} className="text-gray-300">
+              <div className="font-mono">
+                {method.name}():{" "}
+                <span className="text-blue-400">
+                  {method.returnType || "void"}
+                </span>
+              </div>
+              <div className="text-sm text-gray-400 ml-4">
+                {method.description}
+              </div>
+              <div className="text-sm text-gray-400 ml-4">
+                Visibility: {method.visibility}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="border border-gray-800 bg-black/50 p-4 rounded">
+        <p className="text-green-500 mb-2">{"> "} Relationships</p>
+        <div className="ml-4 space-y-2">
           {(object.fromRelationships || []).map((rel) => (
-            <div key={rel.id} className="bg-gray-700 p-3 rounded">
-              <div>
+            <div key={rel.id} className="text-gray-300">
+              <div className="font-mono">
                 {object.name} <span className="text-blue-400">{rel.type}</span>{" "}
                 {rel.toObject.name}
               </div>
               {rel.description && (
-                <div className="text-sm text-gray-400">{rel.description}</div>
+                <div className="text-sm text-gray-400 ml-4">
+                  {rel.description}
+                </div>
               )}
             </div>
           ))}
           {(object.toRelationships || []).map((rel) => (
-            <div key={rel.id} className="bg-gray-700 p-3 rounded">
-              <div>
+            <div key={rel.id} className="text-gray-300">
+              <div className="font-mono">
                 {rel.fromObject.name}{" "}
                 <span className="text-blue-400">{rel.type}</span> {object.name}
               </div>
               {rel.description && (
-                <div className="text-sm text-gray-400">{rel.description}</div>
+                <div className="text-sm text-gray-400 ml-4">
+                  {rel.description}
+                </div>
               )}
             </div>
           ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 }

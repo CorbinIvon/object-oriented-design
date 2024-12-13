@@ -44,7 +44,7 @@ export default function ObjectPage({
 
   return (
     <div className="container mx-auto font-mono">
-      <ul className="space-y-4 list-none">
+      <ul className="list-none">
         {data.objects.map((obj) => (
           <li
             key={obj.id}
