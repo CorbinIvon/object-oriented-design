@@ -35,7 +35,7 @@ export default function CreatePage() {
     };
 
     try {
-      const response = await fetch("/api/objects", {
+      const response = await fetch("/api/object", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(objectData),

@@ -27,7 +27,7 @@ export default function ObjectPage({
   useEffect(() => {
     async function fetchObjects() {
       try {
-        const response = await fetch(`/api/objects/name/${params.objectName}`);
+        const response = await fetch(`/api/object/name/${params.objectName}`);
         if (!response.ok) throw new Error("Failed to fetch objects");
         const data = await response.json();
         setData(data);
