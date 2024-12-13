@@ -1,10 +1,20 @@
 "use client";
 import { useEffect, useState, use } from "react";
-import type { ObjectDef, Instance, InstanceAttribute } from "@prisma/client";
+import type {
+  ObjectDef,
+  ObjectAttribute,
+  ObjectMethod,
+  Relationship,
+} from "@prisma/client";
 
 interface ObjectDetails extends ObjectDef {
-  instances: (Instance & {
-    attributes: InstanceAttribute[];
+  attributes: ObjectAttribute[];
+  methods: ObjectMethod[];
+  fromRelationships: (Relationship & {
+    toObject: { name: string };
+  })[];
+  toRelationships: (Relationship & {
+    fromObject: { name: string };
   })[];
   creator: {
     username: string;
@@ -49,24 +59,77 @@ export default function ObjectPage({
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">{object.name}</h1>
-      <p className="text-gray-400 mb-4">Created by {object.creator.username}</p>
-      <p className="mb-6">{object.description}</p>
+      <h1 className="text-3xl font-bold mb-2">{object.name}</h1>
+      <p className="text-gray-400 mb-6">
+        Created by {object.creator?.username || "Unknown"}
+      </p>
 
       <div className="bg-gray-800 p-6 rounded-lg mb-6">
-        <h2 className="text-xl mb-4">Instances</h2>
-        <div className="grid gap-4">
-          {object.instances.map((instance) => (
-            <div key={instance.id} className="bg-gray-700 p-4 rounded">
-              <h3 className="font-semibold mb-2">{instance.name}</h3>
-              <div className="grid gap-2">
-                {instance.attributes.map((attr) => (
-                  <div key={attr.id} className="text-sm">
-                    <span className="font-medium">{attr.name}:</span>{" "}
-                    <span className="text-gray-300">{attr.value}</span>
+        <h2 className="text-xl mb-2">Description</h2>
+        <p className="text-gray-300">{object.description}</p>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="bg-gray-800 p-6 rounded-lg">
+          <h2 className="text-xl mb-4">Attributes</h2>
+          <div className="space-y-3">
+            {(object.attributes || []).map((attr) => (
+              <div key={attr.id} className="bg-gray-700 p-3 rounded">
+                <div className="font-semibold">
+                  {attr.name}: {attr.type}
+                </div>
+                <div className="text-sm text-gray-400">{attr.description}</div>
+                {attr.defaultValue && (
+                  <div className="text-sm text-gray-400">
+                    Default: {attr.defaultValue}
                   </div>
-                ))}
+                )}
               </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-gray-800 p-6 rounded-lg">
+          <h2 className="text-xl mb-4">Methods</h2>
+          <div className="space-y-3">
+            {(object.methods || []).map((method) => (
+              <div key={method.id} className="bg-gray-700 p-3 rounded">
+                <div className="font-semibold">
+                  {method.name}(): {method.returnType || "void"}
+                </div>
+                <div className="text-sm text-gray-400">
+                  {method.description}
+                </div>
+                <div className="text-sm text-blue-400">{method.visibility}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-gray-800 p-6 rounded-lg mt-6">
+        <h2 className="text-xl mb-4">Relationships</h2>
+        <div className="space-y-3">
+          {(object.fromRelationships || []).map((rel) => (
+            <div key={rel.id} className="bg-gray-700 p-3 rounded">
+              <div>
+                {object.name} <span className="text-blue-400">{rel.type}</span>{" "}
+                {rel.toObject.name}
+              </div>
+              {rel.description && (
+                <div className="text-sm text-gray-400">{rel.description}</div>
+              )}
+            </div>
+          ))}
+          {(object.toRelationships || []).map((rel) => (
+            <div key={rel.id} className="bg-gray-700 p-3 rounded">
+              <div>
+                {rel.fromObject.name}{" "}
+                <span className="text-blue-400">{rel.type}</span> {object.name}
+              </div>
+              {rel.description && (
+                <div className="text-sm text-gray-400">{rel.description}</div>
+              )}
             </div>
           ))}
         </div>

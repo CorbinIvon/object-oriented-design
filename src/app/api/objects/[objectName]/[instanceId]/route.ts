@@ -71,14 +71,34 @@ export async function GET(
         id: params.instanceId,
       },
       include: {
+        attributes: true,
+        methods: true,
+        creator: {
+          select: {
+            username: true,
+          },
+        },
         instances: {
           include: {
             attributes: true,
           },
         },
-        creator: {
-          select: {
-            username: true,
+        fromRelationships: {
+          include: {
+            toObject: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        toRelationships: {
+          include: {
+            fromObject: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
       },
@@ -88,7 +108,17 @@ export async function GET(
       return NextResponse.json({ error: "Object not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ object });
+    // Ensure all arrays exist even if empty
+    const sanitizedObject = {
+      ...object,
+      attributes: object.attributes || [],
+      methods: object.methods || [],
+      instances: object.instances || [],
+      fromRelationships: object.fromRelationships || [],
+      toRelationships: object.toRelationships || [],
+    };
+
+    return NextResponse.json({ object: sanitizedObject });
   } catch (error) {
     console.error("Error details:", error);
     return NextResponse.json(
