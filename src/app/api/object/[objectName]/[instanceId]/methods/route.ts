@@ -6,8 +6,8 @@ const methodParameterSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1),
   type: z.string().min(1),
-  defaultValue: z.string().nullable(),
-  isOptional: z.boolean(),
+  defaultValue: z.string().nullable().optional(),
+  isOptional: z.boolean().default(false),
 });
 
 const methodSchema = z.object({
@@ -73,6 +73,14 @@ export async function PUT(
 
       // Update or create methods
       for (const method of methods) {
+        const methodData = {
+          name: method.name,
+          description: method.description,
+          visibility: method.visibility,
+          returnType: method.returnType,
+          objectId: params.instanceId,
+        };
+
         if (method.id) {
           // Delete existing parameters
           await tx.methodParameter.deleteMany({
@@ -83,12 +91,16 @@ export async function PUT(
           await tx.objectMethod.update({
             where: { id: method.id },
             data: {
-              name: method.name,
-              description: method.description,
-              visibility: method.visibility,
-              returnType: method.returnType,
+              ...methodData,
               parameters: {
-                create: method.parameters,
+                createMany: {
+                  data: method.parameters.map((param) => ({
+                    name: param.name,
+                    type: param.type,
+                    defaultValue: param.defaultValue || null,
+                    isOptional: param.isOptional,
+                  })),
+                },
               },
             },
           });
@@ -96,13 +108,16 @@ export async function PUT(
           // Create new method
           await tx.objectMethod.create({
             data: {
-              objectId: params.instanceId,
-              name: method.name,
-              description: method.description,
-              visibility: method.visibility,
-              returnType: method.returnType,
+              ...methodData,
               parameters: {
-                create: method.parameters,
+                createMany: {
+                  data: method.parameters.map((param) => ({
+                    name: param.name,
+                    type: param.type,
+                    defaultValue: param.defaultValue || null,
+                    isOptional: param.isOptional,
+                  })),
+                },
               },
             },
           });
