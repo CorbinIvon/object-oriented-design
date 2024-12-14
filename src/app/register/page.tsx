@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setError(""); // Clear previous errors
     const formData = new FormData(e.currentTarget);
 
     try {
@@ -26,9 +27,17 @@ export default function RegisterPage() {
           username: formData.get("username"),
         }),
       });
-      // ...rest of registration handling...
-    } catch (err) {
-      setError("Registration failed");
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Registration failed");
+      }
+
+      router.push("/login"); // Redirect to login page after successful registration
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Registration failed";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -36,6 +45,7 @@ export default function RegisterPage() {
 
   return (
     <div className="...">
+      {error && <div className="text-red-500 mb-4">{error}</div>}
       <form onSubmit={handleSubmit}>
         <input
           name="email"
