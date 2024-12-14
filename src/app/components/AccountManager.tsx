@@ -14,6 +14,8 @@ export default function AccountManager() {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
+    } else if (!window.location.pathname.includes("LoginRegister")) {
+      router.push("/LoginRegister");
     }
 
     // Listen for user login/logout events
@@ -23,6 +25,9 @@ export default function AccountManager() {
         setUser(JSON.parse(storedUser));
       } else {
         setUser(null);
+        if (!window.location.pathname.includes("LoginRegister")) {
+          router.push("/LoginRegister");
+        }
       }
     };
 
@@ -31,7 +36,7 @@ export default function AccountManager() {
     return () => {
       window.removeEventListener("userChange", handleUserChange);
     };
-  }, []);
+  }, [router]);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
