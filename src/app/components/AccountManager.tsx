@@ -53,7 +53,8 @@ export default function AccountManager() {
           onClick={() => setIsAccountModalOpen(!isAccountModalOpen)}
           className="text-green-500 hover:text-green-400"
         >
-          {"> "}Account
+          {">"}&nbsp;
+          {user.username || user.email.split("@")[0]}
         </button>
       ) : (
         <Link
