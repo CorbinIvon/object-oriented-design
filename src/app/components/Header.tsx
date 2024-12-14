@@ -23,8 +23,8 @@ export default function Header() {
   }, []);
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex">
+    <div className="flex items-center justify-between gap-4">
+      <div className="flex min-w-[200px]">
         <Link href="/" className="flex gap-1">
           <span className="text-red-500">●</span>
           <span className="text-yellow-500">●</span>
@@ -34,11 +34,13 @@ export default function Header() {
           {usePathname().replace("/", "") || "Home"}
         </span>
       </div>
-      <div className="flex gap-4">
-        <AccountManager />
+      <div className="flex-1 max-w-[600px]">
         <AuthGuard>
           <TerminalSearch inputRef={searchRef} />
         </AuthGuard>
+      </div>
+      <div className="min-w-[200px] flex justify-end">
+        <AccountManager />
       </div>
     </div>
   );
