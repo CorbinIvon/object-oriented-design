@@ -1,7 +1,7 @@
 "use client";
 import { useState, FormEvent, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { User, Visibility, RelationshipType } from "../types/types";
+import { User } from "../types/types";
 
 export default function CreatePage() {
   const router = useRouter();
@@ -48,8 +48,8 @@ export default function CreatePage() {
       } else {
         setError(data.error || "Failed to create object");
       }
-    } catch (err) {
-      setError("An error occurred while creating the object");
+    } catch (err: unknown) {
+      setError(`An error occurred while creating the object: ${err}`);
     } finally {
       setLoading(false);
     }

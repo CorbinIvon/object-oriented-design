@@ -3,6 +3,17 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { hashPassword } from "@/utils/auth";
 
+// Add this interface near the top of the file
+interface ApiError {
+  response?: {
+    data?: {
+      details?: Array<{
+        message: string;
+      }>;
+    };
+  };
+}
+
 export default function LoginRegister() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const [formData, setFormData] = useState({
@@ -86,7 +97,7 @@ export default function LoginRegister() {
         setError(data.error || "Login failed");
       }
     } catch (err) {
-      setError("An error occurred during login");
+      setError(`An error occurred during login: ${err}`);
     } finally {
       setLoading(false);
     }
@@ -97,7 +108,7 @@ export default function LoginRegister() {
     setError("");
     setLoading(true);
 
-    const { isValid, validations } = validatePassword(formData.password);
+    const { isValid } = validatePassword(formData.password);
     if (!isValid) {
       setError("Password doesn't meet requirements");
       setLoading(false);
@@ -130,15 +141,21 @@ export default function LoginRegister() {
       } else {
         setError(data.error || "Registration failed");
       }
-    } catch (err) {
-      if (err instanceof Error && (err as any).response?.data?.details) {
-        setError(
-          (err as any).response.data.details
-            .map((d: any) => d.message)
-            .join(", ")
-        );
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        (err as ApiError).response?.data?.details
+      ) {
+        const apiError = err as ApiError;
+        const errorDetails = apiError.response?.data?.details;
+        if (errorDetails) {
+          setError(errorDetails.map((detail) => detail.message).join(", "));
+        } else {
+          setError(`An error occurred during registration: ${err}`);
+        }
       } else {
-        setError("An error occurred during registration");
+        setError(`An error occurred during registration: ${err}`);
       }
     } finally {
       setLoading(false);

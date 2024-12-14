@@ -78,7 +78,7 @@ export default function SearchPage() {
 
       <div className="border border-gray-800 bg-black/50 p-4 rounded">
         <div className="flex items-center gap-6 mb-4">
-          <p className="text-yellow-500">Search Results: "{query}"</p>
+          <p className="text-yellow-500">Search Results: &quot;{query}&quot;</p>
           <select
             value={resultsPerPage}
             onChange={(e) => setResultsPerPage(Number(e.target.value))}
