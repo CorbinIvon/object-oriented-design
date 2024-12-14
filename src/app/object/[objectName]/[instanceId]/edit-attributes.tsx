@@ -25,6 +25,7 @@ export default function EditAttributes({
       })
     )
   );
+  const [invalidFields, setInvalidFields] = useState<number[]>([]);
 
   const addAttribute = () => {
     setAttrs([
@@ -53,6 +54,20 @@ export default function EditAttributes({
     );
   };
 
+  const handleSave = () => {
+    const emptyNameIndices = attrs
+      .map((attr, index) => (attr.name.trim() === "" ? index : -1))
+      .filter((index) => index !== -1);
+
+    if (emptyNameIndices.length > 0) {
+      setInvalidFields(emptyNameIndices);
+      return;
+    }
+
+    setInvalidFields([]);
+    onSave(attrs);
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-4">
       <section className="border border-gray-800 bg-black/50 p-4 rounded">
@@ -75,12 +90,26 @@ export default function EditAttributes({
                   <input
                     type="text"
                     value={attr.name}
-                    onChange={(e) =>
-                      updateAttribute(index, "name", e.target.value)
-                    }
+                    onChange={(e) => {
+                      updateAttribute(index, "name", e.target.value);
+                      if (invalidFields.includes(index)) {
+                        setInvalidFields(
+                          invalidFields.filter((i) => i !== index)
+                        );
+                      }
+                    }}
                     placeholder="Name"
-                    className="w-full bg-black/30 text-gray-300 border border-gray-700 rounded p-2"
+                    className={`w-full bg-black/30 text-gray-300 border ${
+                      invalidFields.includes(index)
+                        ? "border-red-500"
+                        : "border-gray-700"
+                    } rounded p-2`}
                   />
+                  {invalidFields.includes(index) && (
+                    <div className="text-red-500 text-xs mt-1">
+                      Name is required
+                    </div>
+                  )}
                 </td>
                 <td className="p-2">
                   <input
@@ -156,7 +185,7 @@ export default function EditAttributes({
           Cancel
         </button>
         <button
-          onClick={() => onSave(attrs)}
+          onClick={handleSave}
           className="px-4 py-2 text-sm text-green-500 border border-green-500 rounded hover:bg-green-500 hover:text-black"
         >
           Save Changes
