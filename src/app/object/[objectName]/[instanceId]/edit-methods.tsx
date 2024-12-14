@@ -13,19 +13,19 @@ interface EditMethodsProps {
 }
 
 export default function EditMethods({
-  methods,
+  methods = [], // Add default empty array
   onSave,
   onCancel,
 }: EditMethodsProps) {
   const [methodList, setMethodList] = useState<MethodUpdate[]>(
-    methods.map(
-      ({ id, name, description, visibility, returnType, parameters }) => ({
+    (methods || []).map(
+      ({ id, name, description, visibility, returnType, parameters = [] }) => ({
         id,
         name,
         description,
         visibility,
         returnType,
-        parameters: parameters.map(
+        parameters: (parameters || []).map(
           ({ id, name, type, defaultValue, isOptional }) => ({
             id,
             name,

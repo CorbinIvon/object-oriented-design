@@ -1,8 +1,13 @@
 import type {
   ObjectAttribute,
   ObjectMethod,
+  MethodParameter,
   Relationship,
 } from "@prisma/client";
+
+export interface ObjectMethodWithParams extends ObjectMethod {
+  parameters: MethodParameter[];
+}
 
 export interface ObjectDetails {
   id: string;
@@ -13,7 +18,7 @@ export interface ObjectDetails {
   version: string;
   description: string;
   attributes: ObjectAttribute[];
-  methods: ObjectMethod[];
+  methods: ObjectMethodWithParams[];
   fromRelationships: (Relationship & {
     toObject: { name: string };
   })[];
