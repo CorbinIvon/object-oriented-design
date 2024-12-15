@@ -56,11 +56,15 @@ export default function ObjectPage({
 
   const handleSave = async (description: string) => {
     try {
+      const userId = localStorage.getItem("userId");
       const response = await fetch(
         `/api/object/${params.objectName}/${params.instanceId}`,
         {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-User-Id": userId || "",
+          },
           body: JSON.stringify({ description }),
         }
       );
@@ -77,11 +81,15 @@ export default function ObjectPage({
 
   const handleAttributesSave = async (attributes: AttributeUpdate[]) => {
     try {
+      const userId = localStorage.getItem("userId");
       const response = await fetch(
         `/api/object/${params.objectName}/${params.instanceId}/attributes`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-User-Id": userId || "",
+          },
           body: JSON.stringify({ attributes }),
         }
       );
@@ -100,11 +108,15 @@ export default function ObjectPage({
 
   const handleMethodsSave = async (methods: MethodUpdate[]) => {
     try {
+      const userId = localStorage.getItem("userId");
       const response = await fetch(
         `/api/object/${params.objectName}/${params.instanceId}/methods`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-User-Id": userId || "",
+          },
           body: JSON.stringify({ methods }),
         }
       );

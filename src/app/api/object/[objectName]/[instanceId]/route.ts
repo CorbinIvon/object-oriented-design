@@ -15,14 +15,38 @@ export async function PATCH(
     const body = await request.json();
     const { description } = updateObjectSchema.parse(body);
 
+    // Check if user is authorized
+    const existingObject = await prisma.objectDef.findUnique({
+      where: { id: params.instanceId },
+      select: { creatorId: true },
+    });
+
+    if (!existingObject) {
+      return NextResponse.json({ error: "Object not found" }, { status: 404 });
+    }
+
+    // Get current user ID from request headers
+    const currentUserId = request.headers.get("X-User-Id");
+    if (!currentUserId || currentUserId !== existingObject.creatorId) {
+      return NextResponse.json(
+        { error: "Not authorized to modify this object" },
+        { status: 403 }
+      );
+    }
+
     const updatedObject = await prisma.objectDef.update({
       where: { id: params.instanceId },
       data: { description },
       include: {
         attributes: true,
-        methods: true,
+        methods: {
+          include: {
+            parameters: true,
+          },
+        },
         creator: {
           select: {
+            id: true,
             username: true,
           },
         },
@@ -83,6 +107,7 @@ export async function GET(
         },
         creator: {
           select: {
+            id: true,
             username: true,
           },
         },

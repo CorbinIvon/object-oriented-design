@@ -26,6 +26,7 @@ export interface ObjectDetails {
     fromObject: { name: string };
   })[];
   creator: {
+    id: string;
     username: string;
   };
 }
