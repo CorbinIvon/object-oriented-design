@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 export default function AccountPage() {
   const [user, setUser] = useState<User | null>(null);
   const [designs, setDesigns] = useState<Object[]>([]);
+  const [showHelp, setShowHelp] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -82,23 +83,50 @@ export default function AccountPage() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <button className="border border-green-500/30 rounded-lg p-4 hover:bg-green-500/10 transition-colors">
+        <button
+          onClick={() => (window.location.href = "/create")}
+          className="border border-green-500/30 rounded-lg p-4 hover:bg-green-500/10 transition-colors"
+        >
           <span className="block text-xl mb-2">＋</span>
           New Design
         </button>
-        <button className="border border-green-500/30 rounded-lg p-4 hover:bg-green-500/10 transition-colors">
-          <span className="block text-xl mb-2">⚙</span>
-          Settings
-        </button>
-        <button className="border border-green-500/30 rounded-lg p-4 hover:bg-green-500/10 transition-colors">
-          <span className="block text-xl mb-2">◈</span>
-          Templates
-        </button>
-        <button className="border border-green-500/30 rounded-lg p-4 hover:bg-green-500/10 transition-colors">
+        <button
+          onClick={() => setShowHelp(true)}
+          className="border border-green-500/30 rounded-lg p-4 hover:bg-green-500/10 transition-colors"
+        >
           <span className="block text-xl mb-2">?</span>
           Help
         </button>
       </div>
+
+      {/* Help Popup */}
+      {showHelp && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="border border-green-500/30 rounded-lg p-8 bg-black max-w-md">
+            <h2 className="text-2xl mb-4">Need Help?</h2>
+            <p className="text-green-400/70 mb-6">
+              For support, please submit an issue ticket on our GitHub
+              repository:
+              <br />
+              <br />
+              <a
+                href="https://github.com/CorbinIvon/object-oriented-design/issues"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-green-500 hover:text-green-400 underline"
+              >
+                https://github.com/CorbinIvon/object-oriented-design/issues
+              </a>
+            </p>
+            <button
+              onClick={() => setShowHelp(false)}
+              className="border border-green-500/30 rounded px-4 py-2 hover:bg-green-500/10 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
