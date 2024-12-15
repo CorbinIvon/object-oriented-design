@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { User } from "../types/types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 export default function AccountManager() {
   const [user, setUser] = useState<User | null>(null);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -33,8 +34,17 @@ export default function AccountManager() {
 
     window.addEventListener("userChange", handleUserChange);
 
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsAccountModalOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
       window.removeEventListener("userChange", handleUserChange);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [router]);
 
@@ -47,14 +57,13 @@ export default function AccountManager() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={menuRef}>
       {user ? (
         <button
           onClick={() => setIsAccountModalOpen(!isAccountModalOpen)}
           className="text-green-500 hover:text-green-400"
         >
-          {">"}&nbsp;
-          {user.username || user.email.split("@")[0]}
+          {">"}&nbsp;Account
         </button>
       ) : (
         <Link
@@ -69,7 +78,7 @@ export default function AccountManager() {
         <div className="absolute right-0 mt-2 w-48 border border-gray-800 bg-black/95 z-50">
           <div className="p-4 space-y-2">
             <div className="text-gray-500 border-b border-gray-800 pb-2">
-              {user.email}
+              {user.username}
             </div>
             <button className="w-full text-left text-green-500 hover:text-green-400">
               {"> "}Account Settings
