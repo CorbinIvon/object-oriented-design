@@ -1,3 +1,27 @@
+# Quickstart
+
+## Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- [Node.js](https://nodejs.org/en/download/)
+
+```
+# Start the container
+docker-compose up -d
+
+# Install the dependencies
+npm install
+
+# Run the migrations
+npx prisma migrate dev --name init
+
+# Start the development server
+npm run dev
+
+# Open http://localhost:3000 in your browser
+```
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ```prisma
