@@ -14,18 +14,27 @@ export default function AccountManager() {
     // Initial user check
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    } else if (!window.location.pathname.includes("LoginRegister")) {
-      router.push("/LoginRegister");
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      // Store user ID separately for easy access
+      localStorage.setItem("userId", parsedUser.id);
+    } else {
+      localStorage.removeItem("userId");
+      if (!window.location.pathname.includes("LoginRegister")) {
+        router.push("/LoginRegister");
+      }
     }
 
     // Listen for user login/logout events
     const handleUserChange = () => {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        localStorage.setItem("userId", parsedUser.id);
       } else {
         setUser(null);
+        localStorage.removeItem("userId");
         if (!window.location.pathname.includes("LoginRegister")) {
           router.push("/LoginRegister");
         }
@@ -50,6 +59,7 @@ export default function AccountManager() {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("userId");
     setUser(null);
     setIsAccountModalOpen(false);
     window.dispatchEvent(new Event("userChange"));

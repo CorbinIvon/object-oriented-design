@@ -22,6 +22,9 @@ export default function ViewObject({
   onEditAttributes,
   onEditMethods,
 }: ViewObjectProps) {
+  const currentUserId = localStorage.getItem("userId");
+  const isOwner = currentUserId === object.creator.id;
+
   return (
     <div className="container mx-auto p-6 space-y-4">
       {/* Description Section */}
@@ -30,12 +33,14 @@ export default function ViewObject({
           <p className="text-green-500">
             {"> "} {object.name}: version {object.version}
           </p>
-          <button
-            onClick={onEdit}
-            className="px-3 py-1 text-sm text-green-500 border border-green-500 rounded hover:bg-green-500 hover:text-black transition-colors"
-          >
-            Edit
-          </button>
+          {isOwner && (
+            <button
+              onClick={onEdit}
+              className="px-3 py-1 text-sm text-green-500 border border-green-500 rounded hover:bg-green-500 hover:text-black transition-colors"
+            >
+              Edit
+            </button>
+          )}
         </div>
         <div className="ml-4 text-gray-300">
           <p className="text-gray-400">
@@ -45,6 +50,7 @@ export default function ViewObject({
             updated: {new Date(object.updatedAt).toLocaleString()}
           </p>
           <p>Created by: {object.creator.username}</p>
+          {/* <p className="text-gray-500">Creator ID: {object.creator.id}</p> */}
           <p>{object.description}</p>
         </div>
       </section>
@@ -53,12 +59,14 @@ export default function ViewObject({
       <section className="border border-gray-800 bg-black/50 p-4 rounded">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-green-500">{"> "} Attributes</h2>
-          <button
-            onClick={onEditAttributes}
-            className="px-3 py-1 text-sm text-green-500 border border-green-500 rounded hover:bg-green-500 hover:text-black transition-colors"
-          >
-            Edit Attributes
-          </button>
+          {isOwner && (
+            <button
+              onClick={onEditAttributes}
+              className="px-3 py-1 text-sm text-green-500 border border-green-500 rounded hover:bg-green-500 hover:text-black transition-colors"
+            >
+              Edit Attributes
+            </button>
+          )}
         </div>
         <table className="w-full">
           <thead>
@@ -104,12 +112,14 @@ export default function ViewObject({
       <section className="border border-gray-800 bg-black/50 p-4 rounded">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-green-500">{"> "} Methods</h2>
-          <button
-            onClick={onEditMethods}
-            className="px-3 py-1 text-sm text-green-500 border border-green-500 rounded hover:bg-green-500 hover:text-black transition-colors"
-          >
-            Edit Methods
-          </button>
+          {isOwner && (
+            <button
+              onClick={onEditMethods}
+              className="px-3 py-1 text-sm text-green-500 border border-green-500 rounded hover:bg-green-500 hover:text-black transition-colors"
+            >
+              Edit Methods
+            </button>
+          )}
         </div>
         <div className="ml-4 space-y-4">
           {(object.methods || []).map((method) => (

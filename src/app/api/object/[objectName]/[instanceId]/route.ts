@@ -23,6 +23,7 @@ export async function PATCH(
         methods: true,
         creator: {
           select: {
+            id: true,
             username: true,
           },
         },
@@ -83,6 +84,7 @@ export async function GET(
         },
         creator: {
           select: {
+            id: true,
             username: true,
           },
         },
