@@ -13,6 +13,9 @@ docker-compose up -d
 # Install the dependencies
 npm install
 
+# Install prisma
+npm install prisma --save-dev
+
 # Run the migrations
 npx prisma migrate dev --name init
 
