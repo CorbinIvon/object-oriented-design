@@ -24,19 +24,37 @@ export async function PUT(
     const body = await request.json();
     const { attributes } = updateAttributesSchema.parse(body);
 
-    // Get existing attributes
+    // Check if user is authorized
     const existingObject = await prisma.objectDef.findUnique({
       where: { id: params.instanceId },
-      include: { attributes: true },
+      select: { creatorId: true },
     });
 
     if (!existingObject) {
       return NextResponse.json({ error: "Object not found" }, { status: 404 });
     }
 
+    // Get current user ID from request headers
+    const currentUserId = request.headers.get("X-User-Id");
+    if (!currentUserId || currentUserId !== existingObject.creatorId) {
+      return NextResponse.json(
+        { error: "Not authorized to modify this object" },
+        { status: 403 }
+      );
+    }
+
+    // Get existing attributes
+    const existingObjectWithAttributes = await prisma.objectDef.findUnique({
+      where: { id: params.instanceId },
+      include: { attributes: true },
+    });
+
     // Create sets of IDs for comparison
+    if (!existingObjectWithAttributes) {
+      return NextResponse.json({ error: "Object not found" }, { status: 404 });
+    }
     const existingIds = new Set(
-      existingObject.attributes.map((attr) => attr.id)
+      existingObjectWithAttributes.attributes.map((attr) => attr.id)
     );
     const updatedIds = new Set(
       attributes.filter((attr) => attr.id).map((attr) => attr.id)
@@ -88,9 +106,14 @@ export async function PUT(
         where: { id: params.instanceId },
         include: {
           attributes: true,
-          methods: true,
+          methods: {
+            include: {
+              parameters: true,
+            },
+          },
           creator: {
             select: {
+              id: true,
               username: true,
             },
           },

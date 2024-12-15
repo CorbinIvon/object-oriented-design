@@ -61,9 +61,7 @@ export default function SearchPage() {
 
   const handleCreateNew = () => {
     const objectName = query.trim() || "NewObject";
-    router.push(
-      `/create?name=${encodeURIComponent(objectName)}&creatorId=${userId}`
-    );
+    router.push(`/create?name=${encodeURIComponent(objectName)}`);
   };
 
   return (
