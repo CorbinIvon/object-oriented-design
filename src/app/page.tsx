@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 export default function AccountPage() {
   const [user, setUser] = useState<User | null>(null);
+  const [designCount, setDesignCount] = useState<number>(0);
   const [designs, setDesigns] = useState<Object[]>([]);
   const [showHelp, setShowHelp] = useState(false);
   const router = useRouter();
@@ -15,8 +16,20 @@ export default function AccountPage() {
       router.push("/LoginRegister");
       return;
     }
-    setUser(JSON.parse(storedUser));
-    setDesigns([]);
+    const userData = JSON.parse(storedUser);
+    setUser(userData);
+
+    // Fetch design count
+    fetch(`/api/designs?userId=${userData.id}&count=true`)
+      .then((res) => res.json())
+      .then((data) => setDesignCount(data.count))
+      .catch((err) => console.error("Failed to fetch design count:", err));
+
+    // Fetch recent designs for activity
+    fetch(`/api/designs?userId=${userData.id}`)
+      .then((res) => res.json())
+      .then((data) => setDesigns(data))
+      .catch((err) => console.error("Failed to fetch designs:", err));
   }, [router]);
 
   return (
@@ -42,9 +55,12 @@ export default function AccountPage() {
 
       {/* Statistics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="border border-green-500/30 rounded-lg p-6 hover:border-green-500 transition-colors">
+        <div
+          onClick={() => router.push("/myDesigns")}
+          className="border border-green-500/30 rounded-lg p-6 hover:border-green-500 transition-colors cursor-pointer"
+        >
           <h3 className="text-xl mb-2">Total Designs</h3>
-          <p className="text-4xl font-mono">{designs.length}</p>
+          <p className="text-4xl font-mono">{designCount}</p>
         </div>
         <div className="border border-green-500/30 rounded-lg p-6 hover:border-green-500 transition-colors">
           <h3 className="text-xl mb-2">Last Active</h3>
