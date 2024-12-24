@@ -34,7 +34,9 @@ export default function MyDesignsPage() {
             designs.map((design) => (
               <div
                 key={design.id}
-                onClick={() => router.push(`/design/${design.id}`)}
+                onClick={() =>
+                  router.push(`/object/${design.name}/${design.id}`)
+                }
                 className="border border-green-500/30 rounded-lg p-4 hover:border-green-500 transition-colors cursor-pointer"
               >
                 <h3 className="text-xl mb-2">{design.name}</h3>
